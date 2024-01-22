@@ -4,6 +4,11 @@ import Home from "../pages/home";
 import Contact from "../pages/contact";
 import Maps from "../pages/maps";
 import Error from "../pages/error";
+import Astronomy from "../pages/astronomy";
+import HistoricalWeather from "../pages/historical-weather";
+import DailyWeather from "../pages/daily-weather";
+import HourlyWeather from "../pages/hourly-weather";
+import Settings from "../pages/settings";
 
 export const router = createBrowserRouter([
   {
@@ -15,12 +20,32 @@ export const router = createBrowserRouter([
         element: <Home />
       },
       {
+        path: "hourly-weather",
+        element: <HourlyWeather/>
+      },
+      {
+        path: "daily-weather",
+        element: <DailyWeather />
+      },
+      {
         path: "contact",
         element: <Contact />
       },
       {
         path: "maps",
         element: <Maps />
+      },
+      {
+        path: "astronomy",
+        element: <Astronomy />
+      },
+      {
+        path: "historical-weather",
+        element: <HistoricalWeather />
+      },
+      {
+        path: "settings",
+        element: <Settings />
       },
       {
         path: "*",
