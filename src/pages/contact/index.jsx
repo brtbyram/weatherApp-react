@@ -1,9 +1,8 @@
 
-
-function Contact() {
+const Contact = () => {
   return (
-    <div>Contact</div>
-  )
-}
+<div>dfsfs</div>
+  );
+};
 
-export default Contact
+export default Contact; 

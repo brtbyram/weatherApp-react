@@ -7,7 +7,7 @@ function HistoricalWeather() {
 
   const [pastWeatherData, setPastWeatherData] = useState([])
 
-  const fetchData = async (location, date) => {
+  const fetchData = async (location , date) => {
     try {
       const response = await axios.get(`http://api.weatherapi.com/v1/history.json?key=${import.meta.env.VITE_WEATHER_API}&q=${location}&dt=${date}`)
       setPastWeatherData(response.data)
@@ -20,9 +20,9 @@ function HistoricalWeather() {
 
 
   return (
-    <div className="mx-auto bg-[#91AEC4] w-full flex-1">
+    <div className="mx-auto w-full bg-white h-screen container">
       <Formik
-        initialValues={{ location: '', date: '' }}
+        initialValues={{ location: "", date: "" }}
         validate={values => {
           const errors = {};
           if (!values.location) {

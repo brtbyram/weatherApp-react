@@ -8,17 +8,16 @@ import 'swiper/css';
 import 'swiper/css/navigation';
 import 'swiper/css/pagination';
 import clsx from "clsx";
+import { Icon } from "../../Icons";
+
 
 export default function Home() {
-    const [location, setLocation] = useState()
 
     const [weatherData, setWeatherData] = useState(null)
     const [formData, setFormData] = useState({
-        location: "new york"
+        location: null
     })
-
-    const [address, setAddress] = useState('');
-    const [error, setError] = useState(null);
+    const [location, setLocation] = useState()
 
     useEffect(() => {
         // Kullanıcının konumunu al
@@ -26,32 +25,37 @@ export default function Home() {
             navigator.geolocation.getCurrentPosition(
                 async (position) => {
                     const { latitude, longitude } = position.coords;
-                    setLocation({ latitude, longitude });
-
-                    // Konumu adres bilgisine dönüştür
                     try {
                         const response = await fetch(
-                            `https://maps.googleapis.com/maps/api/geocode/json?latlng=${latitude},${longitude}&key=YOUR_GOOGLE_MAPS_API_KEY`
+                            `https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${latitude}&longitude=${longitude}&localityLanguage=tr`
                         );
                         const data = await response.json();
-
-                        if (data.results && data.results.length > 0) {
-                            setAddress(data.results[0].formatted_address);
-                        } else {
-                            setError('Adres bilgisi bulunamadı.');
-                        }
+                        setLocation(data.city)
+                        setFormData({
+                            location: data.city
+                        })
                     } catch (error) {
-                        setError('Adres bilgisi alınamıyor.');
+                        console.log("Adres bilgisi alınamadı.");
                     }
-                },
-                (error) => {
-                    setError(error.message);
                 }
             );
-        } else {
-            setError('Tarayıcınız konum hizmetlerini desteklemiyor.');
         }
     }, []);
+
+
+    const handleSubmit = (e) => {
+        e.preventDefault()
+        setFormData({
+            location
+        })
+    }
+
+    useEffect(() => {
+        if (formData.location) {
+            fetchData(formData.location)
+            setLocation("")
+        }
+    }, [formData])
 
     const fetchData = async (location) => {
         try {
@@ -63,72 +67,60 @@ export default function Home() {
         }
     }
 
-    const handleSubmit = (e) => {
-        e.preventDefault()
-        setFormData({
-            location
-        })
-    }
-
-
-    useEffect(() => {
-        if (formData.location) {
-            fetchData(formData.location)
-        }
-    }, [formData])
-
-
     return (
 
-        <main className="flex flex-col">
+        <main className="flex flex-col container bg-white mx-auto">
             <div className=" h-min-h py-5 flex items-center justify-center">
                 <form className="grid sm:grid-flow-col gap-2 max-md:w-[95%]" onSubmit={handleSubmit}>
-                    <input type="text" className="h-10 rounded px-3" value={location} name="location" placeholder="Şehir giriniz" onChange={(e) => setLocation(e.target.value)} />
-                    <button type="submit" className="bg-[#3F72AF]  text-white p-2 rounded-lg">Gönder</button>
+                    <input type="text" className="h-10 rounded px-3 bg-[#DBE2EF] outline-none placeholder:text-white" value={location} name="location" placeholder="Search City" onChange={(e) => setLocation(e.target.value)} />
+                    <button type="submit" className="bg-[#112d4e] text-white p-2 rounded-lg">Search</button>
                 </form>
             </div>
             {weatherData && (
                 <div className="w-[80%] mx-auto">
-                    <div className=" bg-[#F9F7F7] rounded-lg p-10 text-lg">
-                        <h1 className="flex item-start font-semibold text-xl p-5">{weatherData.location.name} için Bugünün Hava Durumu Tahmini</h1>
+                    <div className="bg-[#F9F7F7] bg-[url(https://cdn.shopify.com/s/files/1/0265/2458/1987/files/elline_blogpost_Daytime_versus_Nighttime.jpg?v=1589744173)] bg-cover  rounded-lg p-10 text-lg relative">
+                        <h1 className="flex justify-center font-extrabold text-3xl text-[#F9F7F7] mb-5 z-10">{weatherData.location.name} için Bugünün Hava Durumu Tahmini</h1>
                         <div className="flex">
-                            <img width={100} src={weatherData.forecast.forecastday[0].day.condition.icon} alt="" />
-                            <div className="font-semibold text-xl">
+                            <img width={100} className="z-10" src={weatherData.forecast.forecastday[0].day.condition.icon} alt="" />
+                            <div className="font-semibold text-xl text-white z-10">
                                 <h2 className="">{weatherData.current.temp_c} °C</h2>
                                 <h2>{weatherData.location.name}</h2>
                             </div>
                         </div>
-                        <div className="grid grid-cols-2 gap-2 mt-8">
+                        <div className="grid grid-cols-2 gap-2 mt-8 text-white text-lg">
                             <div className="flex items-center space-x-2">
-                                <span className="material-symbols-outlined">thermometer_add</span>
+                            <Icon name="maxTemp" size="50" />
                                 <div className="">Max Temp: {weatherData.forecast.forecastday[0].day.maxtemp_c}°C</div>
                             </div>
                             <h2 className="">Total Precip: {weatherData.forecast.forecastday[0].day.totalprecip_mm} mm</h2>
                             <div className="flex items-center space-x-2">
-                                <span className="material-symbols-outlined">thermometer_minus</span>
+                                <Icon name="minTemp" size="50" />
                                 <h2 className="">Min Temp: {weatherData.forecast.forecastday[0].day.mintemp_c}°C</h2>
                             </div>
 
+                            <div className="flex items-center space-x-2">
+                            <Icon name="uv" size="50" />
                             <h2 className="">UV: {weatherData.forecast.forecastday[0].day.uv}</h2>
+                            </div>
 
                             <div className="flex items-center space-x-2">
-                                <span className="material-symbols-outlined">thermostat_auto</span>
+                                <Icon name="autoTemp" size="50" />
                                 <h2 className="">Avg Temp: {weatherData.forecast.forecastday[0].day.avgtemp_c}°C</h2>
                             </div>
                             <div className="flex items-center space-x-2">
-                                <span className="material-symbols-outlined">water_lux</span>
+                                <Icon name="sunRise" size="50" />
                                 <h2 className="">Sunrise: {weatherData.forecast.forecastday[0].astro.sunrise}</h2>
                             </div>
                             <div className="flex items-center space-x-2">
-                                <span className="material-symbols-outlined">wb_twilight</span>
+                                <Icon name="sunSet" size="50" />
                                 <h2 className="">Sunset: {weatherData.forecast.forecastday[0].astro.sunset}</h2>
                             </div>
                             <div className="flex items-center space-x-2">
-                                <span className="material-symbols-outlined">air</span>
+                                <Icon name="windy" size="50" />
                                 <h2 className="">Max Wind: {weatherData.forecast.forecastday[0].day.maxwind_kph} km/h</h2>
                             </div>
                             <div className="flex items-center space-x-2">
-                                <span className="material-symbols-outlined">humidity_mid</span>
+                                <Icon name="humidity" size="50" />
                                 <h2>Avg Humidity: %{weatherData.forecast.forecastday[0].day.avghumidity}</h2>
                             </div>
                             <div className="flex items-center space-x-2">
@@ -139,9 +131,13 @@ export default function Home() {
                                 <span className="material-symbols-outlined">rainy</span>
                                 <h2 className="">Chance of Rain: %{weatherData.forecast.forecastday[0].day.daily_chance_of_rain}</h2>
                             </div>
+                            <div className="flex items-center space-x-2">
+                                <Icon name="moonSet" size="50" />
+                                <h2 className="">Moonset: {weatherData.forecast.forecastday[0].astro.moonset}</h2>
+                            </div>
 
                             <h2 className="">Moonrise: {weatherData.forecast.forecastday[0].astro.moonrise}</h2>
-                            <h2 className="">Moonset: {weatherData.forecast.forecastday[0].astro.moonset}</h2>
+
                             <h2 className="">Moon Phase: {weatherData.forecast.forecastday[0].astro.moon_phase}</h2>
                             <h2 className="">Moon Illumination: {weatherData.forecast.forecastday[0].astro.moon_illumination}</h2>
                             <h2 className="">Condition: {weatherData.forecast.forecastday[0].day.condition.text}</h2>
@@ -149,17 +145,49 @@ export default function Home() {
 
                         </div>
                     </div>
-                    <div className="bg-[#F9F7F7] rounded-lg mt-10 text-lg">
+
+                    <div className="bg-[#F9F7F7] rounded-lg mt-10 text-lg flex flex-col items-center relative mb-10">
+                        <h1 className="flex justify-center font-extrabold text-3xl text-[#F9F7F7] mb-5 pt-10 z-10">7 Day Forecast</h1>
+                        <Swiper
+                            spaceBetween={-20}
+                            slidesPerView={window.innerWidth < 768 ? 2 : 7}
+                            parallax={true}
+                            onSlideChange={() => console.log('slide change')}
+                            onSwiper={(swiper) => console.log(swiper)}
+                            className="w-full pb-10"
+                        >
+                            {weatherData.forecast.forecastday.map((day) => (
+                                <SwiperSlide key={day.date} className="flex justify-center border-black items-center text-center px-1">
+                                    {({ isActive }) => (
+                                        <div className={clsx("flex flex-col border items-center font-medium px-4 pb-5 text-md justify-start w-60 h-80 bg-[#F9F7F7] opacity-85", {
+                                            "bg-[#112d4e] text-white": isActive
+                                        })}>
+                                            <h6 className="pt-4 text-2xl font-bold w-full mx-auto">{moment(day.date).format("ddd").toUpperCase()}</h6>
+                                            <img className="w-32" src={day.day.condition.icon} alt={day.day.condition.text} />
+                                            <h6>{day.day.avgtemp_c} °C - {day.day.mintemp_c} °C</h6>
+                                            <h6 className="flex-1">{day.day.condition.text}</h6>
+                                            <h6>{day.day.daily_chance_of_rain} %</h6>
+                                        </div>
+                                    )}
+                                </SwiperSlide>
+                            ))}
+                        </Swiper>
+                        <img className="w-full h-full absolute opacity-50 rounded-lg" src="https://t4.ftcdn.net/jpg/02/66/38/15/360_F_266381525_alVrbw15u5EjhIpoqqa1eI5ghSf7hpz7.jpg" alt="" />
+                    </div>
+                    <div className="bg-[#F9F7F7] rounded-lg mt-10 text-lg p-10">
                         <h1 className="flex item-start font-semibold text-xl p-10">Saatlik Tahmin</h1>
                         <Swiper
                             spaceBetween={0}
                             slidesPerView={7}
+                            parallax={true}
+                            initialSlide={moment().format('H') - 1}
+                            loop={true}
                             onSlideChange={() => console.log('slide change')}
                             onSwiper={(swiper) => console.log(swiper)}
                             className=" rounded p-10 text-lg"
                         >
                             {weatherData.forecast.forecastday[0].hour.map((hour, index) => (
-                                <SwiperSlide key={index} className="flex flex-col items-center justify-center mx-auto w-24">
+                                <SwiperSlide key={index} className="flex  flex-col items-center justify-center mx-auto w-24">
                                     <div className={clsx("rounded", {
                                         "bg-[#3F72AF] text-white p-5": moment(hour.time).format('H') === moment().format('H'),
                                     })}>
@@ -170,55 +198,6 @@ export default function Home() {
                                 </SwiperSlide>
                             ))
                             }
-                        </Swiper>
-                    </div>
-                    <div className="bg-[#F9F7F7] rounded-lg mt-10 text-lg">
-                        <h1>14 Günlük hava durumu tahmini</h1>
-                        <Swiper
-                            spaceBetween={-20}
-                            slidesPerView={window.innerWidth < 768 ? 2 : 5}
-                            navigation
-                            pagination={{ clickable: true }}
-                            parallax={true}
-                            onSlideChange={() => console.log('slide change')}
-                            onSwiper={(swiper) => console.log(swiper)}
-                            className="w-full bg-[#3F72AF]"
-                        >
-                            {weatherData.forecast.forecastday.map((day) => (
-                                <SwiperSlide key={day.date} className="flex justify-center items-center text-center">
-                                    {({ isActive }) => (
-                                        <div className={clsx("flex flex-col items-center justify-center w-60 h-60 bg-[#F9F7F7]", {
-                                            "bg-[#3F72AF] w-[140%] h-80": isActive
-                                        })}>
-                                            <h6>{day.date}</h6>
-                                            <img src={day.day.condition.icon} alt={day.day.condition.text} />
-                                            <h6>{day.day.avgtemp_c} °C - {day.day.mintemp_c} °C</h6>
-                                            <h6>{day.day.condition.text}</h6>
-                                            <h6>{day.day.daily_chance_of_rain} %</h6>
-                                            <Swiper
-                                                spaceBetween={0}
-                                                slidesPerView={7}
-                                                onSlideChange={() => console.log('slide change')}
-                                                onSwiper={(swiper) => console.log(swiper)}
-                                                className="w-full"
-                                            >
-                                                {isActive && (day.hour.map((hour, index) => (
-                                                    <SwiperSlide key={index} className="flex flex-col items-center justify-center mx-auto w-24">
-                                                        <div className={clsx("rounded", {
-                                                            "bg-[#B7D0E1]": moment(hour.time).format('H') === moment().format('H'),
-                                                        })}>
-                                                            <img width={60} height={60} src={hour.condition.icon} alt={hour.condition.text} />
-                                                            <h6>{hour.temp_c} °C</h6>
-                                                            <h6>{moment(hour.time).format('LT')}</h6>
-                                                        </div>
-                                                    </SwiperSlide>
-                                                ))
-                                                )}
-                                            </Swiper>
-                                        </div>
-                                    )}
-                                </SwiperSlide>
-                            ))}
                         </Swiper>
                     </div>
                     <div>
@@ -239,18 +218,7 @@ export default function Home() {
                     </div>
                 </div>
             )}
-            <div className="container">
-                {location ? (
-                    <div>
-                        <p>Konumunuz:</p>
-                        <p>Latitude: {location.latitude}</p>
-                        <p>Longitude: {location.longitude}</p>
-                        {address && <p>Adres: {address}</p>}
-                    </div>
-                ) : (
-                    <p>{error || 'Konum bilgisi alınamıyor...'}</p>
-                )}
-            </div>
+
         </main>
     )
 }

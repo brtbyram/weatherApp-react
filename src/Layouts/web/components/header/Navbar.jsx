@@ -30,14 +30,6 @@ function Navbar() {
       label: "Contact"
     },
     {
-      path: "/signup",
-      label: "Sign Up"
-    },
-    {
-      path: "/login",
-      label: "Log In"
-    },
-    {
       path: "/settings",
       label: "Settings"
     }

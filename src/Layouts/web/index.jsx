@@ -7,7 +7,7 @@ function WebLayout() {
     return (
         <div className="flex flex-col justify-between bg-[#F9F7F7]">
             <Header />
-            <main className="bg-[#DBE2EF] container mx-auto flex-1">
+            <main className="bg-[#DBE2EF]">
                 <Outlet />
             </main>
             <Footer />

@@ -70,18 +70,18 @@ export default function DailyWeather() {
     const chartRef = useRef(null);
 
     const options = {
-        theme: "dark2",
-    
+        theme: "white2",
         animationEnabled: true,
+        animationDuration: 2000,
         zoomEnabled: true,
         exportEnabled: true,
-        
+
         title: {
             text: 'Saatlik Hava Durumu',
         },
         data: [
             {
-                type: 'splineArea',
+                type: 'area',
                 xValueFormatString: 'DD MM YYYY HH:MM',
                 yValueFormatString: '#,##0.00°C',
                 dataPoints: dataPoints,
@@ -91,12 +91,12 @@ export default function DailyWeather() {
 
     return (
 
-        <main className="flex flex-col">
+        <main className="flex flex-col container mx-auto bg-white">
             <div className=" h-min-h py-5 flex items-center justify-center">
                 <form className="grid sm:grid-flow-col gap-2 max-md:w-[95%]" onSubmit={handleSubmit}>
                     <input type="text" className="h-10 rounded px-3" value={location} name="location" placeholder="Şehir giriniz" onChange={(e) => setLocation(e.target.value)} />
                     <input type="number" min={0} max={14} className="h-10 rounded px-3" value={dayNumbers} name="dayNumbers" placeholder="Gün sayısı giriniz" onChange={(e) => setDayNumbers(e.target.value)} />
-                    <button type="submit" className="bg-[#3F72AF]  text-white p-2 rounded-lg">Gönder</button>
+                    <button type="submit" className="bg-[#3F72AF] text-white p-2 rounded-lg">Gönder</button>
                 </form>
             </div>
             {weatherData && (
@@ -118,13 +118,13 @@ export default function DailyWeather() {
                             parallax={true}
                             onSlideChange={() => console.log('slide change')}
                             onSwiper={(swiper) => console.log(swiper)}
-                            className="w-full bg-[#3F72AF]"
+                            className="w-full bg-white text-black "
                         >
                             {weatherData.forecast.forecastday.map((day) => (
                                 <SwiperSlide key={day.date} className="flex justify-center items-center text-center">
                                     {({ isActive }) => (
                                         <div className={clsx("flex flex-col items-center justify-center w-60 h-60 bg-[#B7D0E1", {
-                                            "bg-[#112D4E] w-full h-80": isActive
+                                            "bg-[#3F72AF] text-white w-full h-80": isActive
                                         })}>
                                             <h6>{day.date}</h6>
                                             <img src={day.day.condition.icon} alt={day.day.condition.text} />
@@ -160,8 +160,8 @@ export default function DailyWeather() {
                 </div>
             )
             }
-            <div className="w-[80%] mx-auto my-10">
-            <CanvasJSChart options={options} onRef={(ref) => (chartRef.current = ref)}  />
+            <div className="w-full mx-auto my-10">
+                <CanvasJSChart className="bg-red-700" options={options} onRef={(ref) => (chartRef.current = ref)} />
             </div>
         </main>
     )
