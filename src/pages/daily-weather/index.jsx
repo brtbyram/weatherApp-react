@@ -1,19 +1,15 @@
 import axios from "axios"
-import { useEffect, useRef, useState } from "react"
+import { useEffect, useState } from "react"
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Navigation, Pagination, A11y } from 'swiper/modules';
 import clsx from "clsx";
 import moment from "moment";
-import CanvasJSReact from '@canvasjs/react-charts';
-
 
 import 'swiper/css';
 import 'swiper/css/navigation';
 import 'swiper/css/pagination';
 import { convertTurkishToEnglish } from "../../helpers/convert-turkish-to-english";
 
-
-const { CanvasJSChart } = CanvasJSReact;
 
 export default function DailyWeather() {
     const [location, setLocation] = useState()
@@ -49,45 +45,6 @@ export default function DailyWeather() {
             fetchData(formData.location, formData.dayNumbers)
         }
     }, [formData])
-
-    let dataPoints = [];
-
-    useEffect(() => {
-        if (weatherData) {
-            for (let i = 0; i < weatherData.forecast.forecastday.length; i++) {
-                for (let j = 0; j < weatherData.forecast.forecastday[i].hour.length; j++) {
-                    dataPoints.push({
-                        x: new Date(weatherData.forecast.forecastday[i].hour[j].time),
-                        y: weatherData.forecast.forecastday[i].hour[j].temp_c
-                    });
-                }
-
-            }
-            chartRef.current.render();
-        }
-    }, [weatherData])
-
-    const chartRef = useRef(null);
-
-    const options = {
-        theme: "white2",
-        animationEnabled: true,
-        animationDuration: 2000,
-        zoomEnabled: true,
-        exportEnabled: true,
-
-        title: {
-            text: 'Saatlik Hava Durumu',
-        },
-        data: [
-            {
-                type: 'area',
-                xValueFormatString: 'DD MM YYYY HH:MM',
-                yValueFormatString: '#,##0.00°C',
-                dataPoints: dataPoints,
-            },
-        ],
-    };
 
     return (
 
@@ -160,9 +117,6 @@ export default function DailyWeather() {
                 </div>
             )
             }
-            <div className="w-full mx-auto my-10">
-                <CanvasJSChart className="bg-red-700" options={options} onRef={(ref) => (chartRef.current = ref)} />
-            </div>
         </main>
     )
 }

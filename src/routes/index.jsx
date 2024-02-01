@@ -9,6 +9,7 @@ import HistoricalWeather from "../pages/historical-weather";
 import DailyWeather from "../pages/daily-weather";
 import HourlyWeather from "../pages/hourly-weather";
 import Settings from "../pages/settings";
+import TodayWeather from "../pages/today-weather";
 
 export const router = createBrowserRouter([
   {
@@ -18,6 +19,10 @@ export const router = createBrowserRouter([
       {
         index: true,
         element: <Home />
+      },
+      {
+        path: "today-weather",
+        element: <TodayWeather/>
       },
       {
         path: "hourly-weather",
