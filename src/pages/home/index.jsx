@@ -59,25 +59,25 @@ export default function Home() {
         fetchWeatherData()
     }, [location])
 
-    const handleSubmit = (e) => {
-        e.preventDefault()
-        console.log(location)
-    }   
+    // const handleSubmit = (e) => {
+    //     e.preventDefault()
+    //     console.log(location)
+    // }   
 
     return (
 
-        <main className="flex flex-col container bg-white mx-auto">
-            <div className=" h-min-h py-5 flex items-center justify-center">
+        <main className="flex flex-col bg-gray-100">
+            {/* <div className=" h-min-h py-5 flex items-center justify-center">
                 <form className="grid sm:grid-flow-col gap-2 max-md:w-[95%]" onSubmit={handleSubmit}>
                     <input type="text" className="h-10 rounded px-3 bg-[#DBE2EF] outline-none placeholder:text-white" value={location} name="location" placeholder="Search City" onChange={(e) => dispatch(setLocation(e.target.value))} />
                     <button type="submit" className="bg-[#112d4e] text-white p-2 rounded-lg">Search</button>
                 </form>
-            </div>
+            </div> */}
             {weatherData && (
-                <div className="w-full md:w-[80%] mx-auto">
+                <div className="w-full">
 
-                    <div className="bg-[#F9F7F7] rounded-lg text-lg transition-all duration-700 delay-300">
-                        <div className={clsx(" rounded-lg p-10 w-full h-full bg-cover shadow-2xl", {
+                    <div className="bg-[#F9F7F7] text-lg transition-all duration-700 delay-300">
+                        <div className={clsx(" p-10 w-full h-full bg-cover shadow-2xl", {
                             "bg-[url(https://p4.wallpaperbetter.com/wallpaper/505/189/268/clear-sky-sky-blue-stars-4k-wallpaper-preview.jpg)]": weatherData.current.is_day === 1,
                             "bg-[url(https://p4.wallpaperbetter.com/wallpaper/777/422/528/night-sky-wallpaper-preview.jpg)]": weatherData.current.is_day === 0
 
@@ -187,7 +187,7 @@ export default function Home() {
 
                     </div>
 
-                    <div className="bg-[#F9F7F7] rounded-lg mt-10 text-lg flex flex-col items-center relative mb-10">
+                    <div className="bg-[#F9F7F7] container mx-auto rounded-lg mt-10 text-lg flex flex-col items-center relative mb-10">
                         <h1 className="flex justify-center font-extrabold text-3xl text-[#F9F7F7] mb-5 pt-10 z-10">3 Day Forecast</h1>
                         <Swiper
                             spaceBetween={-20}
@@ -215,7 +215,7 @@ export default function Home() {
                         <img className="w-full h-full absolute opacity-50 rounded-lg" src="https://t4.ftcdn.net/jpg/02/66/38/15/360_F_266381525_alVrbw15u5EjhIpoqqa1eI5ghSf7hpz7.jpg" alt="" />
                     </div>
 
-                    <div className="bg-[#F9F7F7] rounded-lg mt-10 text-lg p-10">
+                    <div className="bg-[#F9F7F7] container mx-auto rounded-lg mt-10 text-lg p-10">
                         <h1 className="flex item-start font-semibold text-xl p-10">Saatlik Tahmin</h1>
                         <Swiper
                             spaceBetween={0}

@@ -1,9 +1,9 @@
 import { useEffect, useState } from 'react'
 import axios from 'axios'
-import { useSelector, useDispatch } from 'react-redux'
+import { useSelector} from 'react-redux'
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { convertTurkishToEnglish } from '../../helpers/convert-turkish-to-english'
-import { setLocation } from "../../features/location/locationSlice";
+// import { setLocation } from "../../features/location/locationSlice";
 import moment from 'moment';
 import { Icon } from '../../Icons';
 import { Disclosure, Transition } from '@headlessui/react';
@@ -27,15 +27,15 @@ function TodayWeather() {
     const [weatherData, setWeatherData] = useState(null)
 
     const location = useSelector(state => state.location.value)
-    const dispatch = useDispatch()
+    // const dispatch = useDispatch()
 
     console.log(location)
-
 
     const fetchData = async (location) => {
         try {
             const response = await axios.get(`http://api.weatherapi.com/v1/forecast.json?key=${import.meta.env.VITE_WEATHER_API}&q=${convertTurkishToEnglish(location)}&days=14&aqi=yes&alerts=yes`)
             setWeatherData(response.data)
+            console.log(response.data)
         } catch (error) {
             console.log(error)
         }
@@ -51,11 +51,11 @@ function TodayWeather() {
         }
     }
 
-    const handleSubmit = (e) => {
-        e.preventDefault()
-        fetchData(location)
-        dispatch(setLocation(""))
-    }
+    // const handleSubmit = (e) => {
+    //     e.preventDefault()
+    //     fetchData(location)
+    //     dispatch(setLocation(""))
+    // }
 
     useEffect(() => {
         fetchData(location)
@@ -101,19 +101,58 @@ function TodayWeather() {
 
     // ]
 
+    const airQuality = () => {
+        if (weatherData.current.air_quality['us-epa-index'] === 1) {
+            return (
+                <div className='flex flex-col items-center space-y-4 text-center'>
+                    <div className='bg-green-600/70 p-4 h-64 w-64 flex items-center text-center justify-center text-white text-4xl font-semibold rounded-full'>Good</div>
+                    <div className='text-center'>Air quality is considered satisfactory, and air pollution poses little or no risk.</div>
+                </div>)
+        } else if (weatherData.current.air_quality['us-epa-index'] === 2) {
+            return (
+                <div className='flex flex-col items-center space-y-4 text-center'>
+                    <div className='bg-yellow-600 p-4 w-64 h-64 flex items-center text-center justify-center text-white text-4xl font-semibold rounded-full'>Moderate</div>
+                    <div>Air quality is acceptable; however, for some pollutants, there may be a moderate health concern for a very small number of people who are unusually sensitive to air pollution.</div>
+                </div>)
+        } else if (weatherData.current.air_quality['us-epa-index'] === 3) {
+            return (
+                <div className='flex flex-col items-center space-y-4 text-center'>
+                    <div className='bg-orange-600 p-4 w-64 h-64 flex items-center text-center justify-center text-white text-4xl font-semibold rounded-full'>Unhealthy for sensitive group</div>
+                    <div>Members of sensitive groups may experience health effects. The general public is not likely to be affected.</div>
+                </div>)
+        } else if (weatherData.current.air_quality['us-epa-index'] === 4) {
+            return (
+                <div className='flex flex-col items-center space-y-4 text-center'>
+                    <div className='bg-red-600 p-4 w-64 h-64 flex items-center text-center justify-center text-white text-4xl font-semibold rounded-full'>Unhealthy</div>
+                    <div >Everyone may begin to experience health effects; members of sensitive groups may experience more serious health effects.</div>
+                </div>)
+        } else if (weatherData.current.air_quality['us-epa-index'] === 5) {
+            return (
+                <div className='flex flex-col items-center space-y-4 text-center'>
+                    <div className='bg-red-700 p-4 w-64 h-64 flex items-center text-center justify-center text-white text-4xl font-semibold rounded-full'>Very Unhealthy</div>
+                    <div>Health alert: everyone may experience more serious health effects.</div>
+                </div>)
+        } else if (weatherData.current.air_quality['us-epa-index'] === 6) {
+            return (
+                <div className='flex flex-col items-center space-y-4 text-center'>
+                    <div className='bg-red-900 p-4 w-64 h-64 flex items-center text-center justify-center text-white text-4xl font-semibold rounded-full'>Hazardous</div>
+                    <div>Health warnings of emergency conditions. The entire population is more likely to be affected.</div>
+                </div>)
+        }
+    }
+
 
     return (
         <main className='h-full'>
-            <div className=" h-min-h py-5 flex items-center justify-center">
-                <form className="grid sm:grid-flow-col gap-2 max-md:w-[95%]" onSubmit={handleSubmit}>
-                    <input type="text" className="h-10 rounded px-3 bg-white outline-none placeholder:text-white" value={location} name="location" placeholder="Search City" onChange={(e) => dispatch(setLocation(e.target.value))} />
-                    <button type="submit" className="bg-[#112d4e] text-white p-2 rounded-lg">Search</button>
-                </form>
-            </div>
             {weatherData && (
-                <div className='grid gap-y-5'>
-
-                    <div className='text-white min-w-full py-10 flex flex-col justify-between items-center bg-[url(https://media.istockphoto.com/id/825778252/tr/foto%C4%9Fraf/mavi-g%C3%B6ky%C3%BCz%C3%BC-ve-bulutlar-beyaz-arka-plan.jpg?s=612x612&w=0&k=20&c=Ej5iKzuVujUEbYZ_a8rM4koHLoAWeKGg_6EcuPGhd6E=)] bg-cover '>
+                <div className='grid gap-y-5 '>
+                    <div className='text-white py-10 min-w-full flex flex-col justify-between items-center bg-[url(https://media.istockphoto.com/id/825778252/tr/foto%C4%9Fraf/mavi-g%C3%B6ky%C3%BCz%C3%BC-ve-bulutlar-beyaz-arka-plan.jpg?s=612x612&w=0&k=20&c=Ej5iKzuVujUEbYZ_a8rM4koHLoAWeKGg_6EcuPGhd6E=)] bg-cover '>
+                        {/* <div className=" h-min-h  text-black mb-10 flex items-center justify-center">
+                            <form className="grid sm:grid-flow-col gap-2" onSubmit={handleSubmit}>
+                                <input type="text" className="h-10 rounded px-3 bg-transparent/20 outline-none" value={location} name="location" placeholder="Search City" onChange={(e) => dispatch(setLocation(e.target.value))} />
+                                <button type="submit" className="bg-[#112d4e]/80 text-white p-2 rounded-lg">Search</button>
+                            </form>
+                        </div> */}
                         <div className='flex'>
                             <img width={150} src={weatherData.current.condition.icon} alt={weatherData.current.condition.text} />
                             <h2 className='font-bold text-5xl'>{weatherData.current.temp_c}°C</h2>
@@ -214,11 +253,11 @@ function TodayWeather() {
                                 <img style={{ transform: `rotate(${day.moonsign_deg}deg)` }} className={`drop-shadow-[0_35px_35px_rgba(0,0,0,0.25)] rounded-full px-2 w-96`} src={`/images/moon-phases/${astronomyData.days[0].phase_img}`} alt="" />
                                 <div className="flex items-center space-x-2 border-b md:mx-4 drop-shadow-lg p-2">
                                     <Icon name="moonSet" size="40" />
-                                    <h2>Moon Rise: {moment(astronomyData.days[0].moonrise).format('LT')}</h2>
+                                    <h2>Moon Rise: {moment(astronomyData.days[0].moonrise).format('HH:mm')} PM</h2>
                                 </div>
                                 <div className="flex items-center space-x-2 border-b md:mx-4 drop-shadow-lg p-2">
                                     <Icon name="moonSet" size="40" />
-                                    <h2>Moon Set: {moment(astronomyData.days[0].moonset).format('LT')}</h2>
+                                    <h2>Moon Set: {moment(astronomyData.days[0].moonset).format('hh:mm')} AM</h2>
                                 </div>
                             </div>
                             <div>
@@ -238,44 +277,48 @@ function TodayWeather() {
                         </div>
                     )}
 
-                    <div className='bg-white flex flex-col p-10 container mx-auto rounded-xl'>
-                        <h2 className='font-semibold text-2xl'>Air Quality</h2>
-                        <div>
-                            <h3>Carbon monoxide CO: {weatherData.current.air_quality.co}</h3>
+                    <div className='bg-white flex-col p-10 container mx-auto rounded-xl grid md:grid-cols-2'>
+                        <div className='flex items-center text-lg justify-center max-md:py-10'>
+                            <div>{airQuality(weatherData.current.air_quality['us-epa-index'])}</div>
                         </div>
                         <div>
-                            <h3>gb-defra-index : {weatherData.current.air_quality['gb-defra-index']}</h3>
+                            <div className="flex items-center space-x-2 border-b md:mx-4 drop-shadow-lg p-2">
+                                <h3 className='flex w-full'><strong className='flex-1'>Nitrogen dioxide NO2:</strong> <span>{weatherData.current.air_quality.no2}</span></h3>
+                            </div>
+                            <div className="flex items-center space-x-2 border-b md:mx-4 drop-shadow-lg p-2">
+                                <h3 className='flex w-full'><strong className='flex-1'>gb-defra-index :</strong> {weatherData.current.air_quality['gb-defra-index']}</h3>
+                            </div>
+                            <div className="flex items-center space-x-2 border-b md:mx-4 drop-shadow-lg p-2">
+                                <h3 className='flex w-full'><strong className='flex-1'>Carbon monoxide CO:</strong> {weatherData.current.air_quality.co}</h3>
+                            </div>
+                            <div className="flex items-center space-x-2 border-b md:mx-4 drop-shadow-lg p-2">
+                                <h3 className='flex w-full'><strong className='flex-1'>pm10 :</strong> {weatherData.current.air_quality.pm10}</h3>
+                            </div>
+                            <div className="flex items-center space-x-2 border-b md:mx-4 drop-shadow-lg p-2">
+                                <h3 className='flex w-full'><strong className='flex-1'>pm2_5 :</strong> {weatherData.current.air_quality.pm2_5}</h3>
+                            </div>
+                            <div className="flex items-center space-x-2 border-b md:mx-4 drop-shadow-lg p-2">
+                                <h3 className='flex w-full'><strong className='flex-1'>Ozone O3:</strong> {weatherData.current.air_quality.o3}</h3>
+                            </div>
+                            <div className="flex items-center space-x-2 border-b md:mx-4 drop-shadow-lg p-2">
+                                <h3 className='flex w-full'><strong className='flex-1'>Sulphur dioxide SO2:</strong> {weatherData.current.air_quality.so2}</h3>
+                            </div>
+                            <div className="flex items-center space-x-2 border-b md:mx-4 drop-shadow-lg p-2">
+                                <h3 className='flex w-full'><strong className='flex-1'>us-epa-index :</strong> {weatherData.current.air_quality['us-epa-index']}</h3>
+                            </div>
                         </div>
-                        <div>
-                            <h3>Nitrogen dioxide NO2: {weatherData.current.air_quality.no2}</h3>
-                        </div>
-                        <div>
-                            <h3>Ozone O3: {weatherData.current.air_quality.o3}</h3>
-                        </div>
-                        <div>
-                            <h3>pm2_5 : {weatherData.current.air_quality.pm2_5}</h3>
-                        </div>
-                        <div>
-                            <h3>pm10 : {weatherData.current.air_quality.pm10}</h3>
-                        </div>
-                        <div>
-                            <h3>Sulphur dioxide SO2: {weatherData.current.air_quality.so2}</h3>
-                        </div>
-                        <div>
-                            <h3>us-epa-index : </h3>
-                            <h1></h1>
-                        </div>
+
                     </div>
 
                     <div className='bg-white container mx-auto p-10 rounded-xl'>
                         <h1 className='font-semibold text-2xl pb-3'>3-Day Forecast</h1>
                         {weatherData.forecast.forecastday.map((day, index) => (
-                            <div key={index} className='border md:px-3 my-2 rounded-xl'>
+                            <div key={index} className=''>
                                 <Disclosure>
                                     {({ open }) => (
-                                        <>
+                                        <div className={`${open && 'bg-gray-400/30'} border md:px-3 my-2 rounded-xl`}>
                                             <Disclosure.Button className=" flex items-center w-full px-4 outline-none ">
-                                                <div className='py-2 flex flex-1 items-center md:space-x-5 '>
+                                                <div className={`py-2 flex flex-1 items-center md:space-x-5 ${open && 'border-b border-gray-400/30'}`}>
                                                     <h2>{day.date}</h2>
                                                     <img src={day.day.condition.icon} />
                                                     <h2>{day.day.maxtemp_c} / {day.day.mintemp_c}°C</h2>
@@ -293,47 +336,45 @@ function TodayWeather() {
                                                 leaveFrom="transform scale-100 opacity-100"
                                                 leaveTo="transform scale-95 opacity-0"
                                             >
-                                                <Disclosure.Panel className="text-black duration-700 transition-all">
+                                                <Disclosure.Panel className={`text-black duration-700 transition-all`}>
                                                     <div className="grid md:grid-cols-2 gap-2 my-6 text-lg">
-                                                        <div className="flex items-center space-x-2 border-b md:mx-4 drop-shadow-lg">
+                                                        <div className="flex items-center space-x-2 border-b border-gray-400/30 md:mx-4 drop-shadow-lg">
                                                             <Icon name="uv" size="50" />
                                                             <h2 className="">UV: {day.day.uv}</h2>
                                                         </div>
-
-
-                                                        <div className="flex items-center space-x-2 border-b md:mx-4 drop-shadow-lg">
+                                                        <div className="flex items-center space-x-2 border-b border-gray-400/30 md:mx-4 drop-shadow-lg">
                                                             <Icon name="windy" size="50" />
                                                             <h2 className="">Max Wind: {day.day.maxwind_kph} km/h</h2>
                                                         </div>
-                                                        <div className="flex items-center space-x-2 border-b md:mx-4 drop-shadow-lg">
+                                                        <div className="flex items-center space-x-2 border-b border-gray-400/30 md:mx-4 drop-shadow-lg">
                                                             <Icon name="autoTemp" size="50" />
                                                             <h2 className="">Avg Temp: {day.day.avgtemp_c}°C</h2>
                                                         </div>
-                                                        <div className="flex items-center space-x-2 border-b md:mx-4 drop-shadow-lg">
+                                                        <div className="flex items-center space-x-2 border-b border-gray-400/30 md:mx-4 drop-shadow-lg">
                                                             <span className="material-symbols-outlined">compress</span>
                                                             <h2 className="">Average Pressure: {day.day.avgtemp_c} mb</h2>
                                                         </div>
-                                                        <div className="flex items-center space-x-2 border-b md:mx-4 drop-shadow-lg">
-                                                            <span className="material-symbols-outlined">rainy</span>
+                                                        <div className="flex items-center space-x-2 border-b border-gray-400/30 md:mx-4 drop-shadow-lg">
+                                                            <Icon name="changeRain" size="50" />
                                                             <h2 className="">Chance of Rain: %{day.day.daily_chance_of_rain}</h2>
                                                         </div>
-                                                        <div className="flex items-center space-x-2 border-b md:mx-4 drop-shadow-lg">
+                                                        <div className="flex items-center space-x-2 border-b border-gray-400/30 md:mx-4 drop-shadow-lg">
                                                             <Icon name="moonSet" size="50" />
                                                             <h2 className="">Moonset: {day.astro.moonset}</h2>
                                                         </div>
-                                                        <div className="flex items-center space-x-2 border-b md:mx-4 drop-shadow-lg">
+                                                        <div className="flex items-center space-x-2 border-b border-gray-400/30 md:mx-4 drop-shadow-lg">
                                                             <Icon name="moonSet" size="50" />
                                                             <h2 className="">Moon Phase: {day.astro.moon_phase}</h2>
                                                         </div>
-                                                        <div className="flex items-center space-x-2 border-b md:mx-4 drop-shadow-lg">
+                                                        <div className="flex items-center space-x-2 border-b border-gray-400/30 md:mx-4 drop-shadow-lg">
                                                             <Icon name="moonSet" size="50" />
                                                             <h2 className="">Condition: {day.day.condition.text}</h2>
                                                         </div>
-                                                        <div className="flex items-center space-x-2 border-b md:mx-4 drop-shadow-lg">
+                                                        <div className="flex items-center space-x-2 border-b border-gray-400/30 md:mx-4 drop-shadow-lg">
                                                             <Icon name="moonSet" size="50" />
                                                             <h2 className="">Moon Illumination: {day.astro.moon_illumination}</h2>
                                                         </div>
-                                                        <div className="flex items-center space-x-2 border-b md:mx-4 drop-shadow-lg">
+                                                        <div className="flex items-center space-x-2 border-b border-gray-400/30 md:mx-4 drop-shadow-lg">
                                                             <Icon name="moonSet" size="50" />
                                                             <h2 className="">Moonrise: {day.astro.moonrise}</h2>
                                                         </div>
@@ -344,7 +385,7 @@ function TodayWeather() {
                                                     </div>
                                                 </Disclosure.Panel>
                                             </Transition>
-                                        </>
+                                        </div>
                                     )}
                                 </Disclosure>
                             </div>
