@@ -12,6 +12,7 @@ import { Icon } from "../../Icons";
 import { useMediaQuery } from 'react-responsive'
 import { useSelector, useDispatch } from 'react-redux'
 import { setLocation } from "../../features/location/locationSlice";
+import TurkeyWeatherMap from "../../components/TurkeyMap";
 
 
 export default function Home() {
@@ -54,7 +55,7 @@ export default function Home() {
             }
             catch (error) {
                 console.log(error)
-            }  
+            }
         }
         fetchWeatherData()
     }, [location])
@@ -191,7 +192,7 @@ export default function Home() {
                         <h1 className="flex justify-center font-extrabold text-3xl text-[#F9F7F7] mb-5 pt-10 z-10">3 Day Forecast</h1>
                         <Swiper
                             spaceBetween={-20}
-                            slidesPerView={isMobile ? 2 : 3 }
+                            slidesPerView={isMobile ? 2 : 3}
                             parallax={true}
 
                             onSlideChange={() => console.log('slide change')}
@@ -219,7 +220,7 @@ export default function Home() {
                         <h1 className="flex item-start font-semibold text-xl p-10">Saatlik Tahmin</h1>
                         <Swiper
                             spaceBetween={0}
-                            slidesPerView={isMobile ? 4 : 6 }
+                            slidesPerView={isMobile ? 4 : 6}
                             parallax={true}
                             initialSlide={moment().format('H') - 1}
                             loop={true}
@@ -261,6 +262,8 @@ export default function Home() {
 
                 </div>
             )}
+
+            <TurkeyWeatherMap />
 
         </main>
     )

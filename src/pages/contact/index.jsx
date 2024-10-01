@@ -1,7 +1,8 @@
-
 const Contact = () => {
   return (
-<div>dfsfs</div>
+<div className="">
+
+</div>
   );
 };
 

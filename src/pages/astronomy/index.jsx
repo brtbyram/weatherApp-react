@@ -7,6 +7,7 @@ import clsx from 'clsx';
 import { useMediaQuery } from 'react-responsive'
 import 'swiper/css';
 import { Icon } from '../../Icons';
+import StarsCanvas from '../../components/Stars';
 
 
 function Astronomy() {
@@ -35,7 +36,8 @@ function Astronomy() {
 
 
   return (
-    <div className="relative">
+    <div className="relative bg-transparent z-1">
+        <StarsCanvas />
       <div>
         {astronomyData && (
           <div >
@@ -53,9 +55,6 @@ function Astronomy() {
               onSwiper={(swiper) => console.log(swiper)}
               className="rounded p-10 text-lg h-full"
             >
-              <div className='absolute left-0 top-0 w-[130%] h-full bg-[url(https://www.icegif.com/wp-content/uploads/2023/04/icegif-763.gif)] bg-cover bg-center bg-no-repeat drop-shadow-[0_35px_35px_rgba(0,0,0,0.25)] box-shadow-[0_35px_35px_rgba(0,0,0,0.25)]'
-                data-swiper-parallax="-23%"
-              ></div>
               {astronomyData.days.map((day, index) => {
                 return (
                   <SwiperSlide key={index}>
