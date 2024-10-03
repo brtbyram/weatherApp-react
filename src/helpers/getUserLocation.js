@@ -1,5 +1,5 @@
 import axios from "axios";
-import { setLocation } from "../redux/locationSlice";
+import { setLocation } from "../redux/reducers/locationSlice";
 
 export const getUserLocation = async (dispatch) => {
     if (navigator.geolocation) {

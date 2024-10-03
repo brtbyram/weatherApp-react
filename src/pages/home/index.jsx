@@ -11,9 +11,9 @@ import { useMediaQuery } from 'react-responsive'
 import { useSelector, useDispatch } from 'react-redux'
 import TurkeyWeatherMap from "../../components/TurkeyMap";
 import StarsCanvas from "../../components/Stars";
-import { fetchWeatherData } from "../../redux/dataSlice";
+import { fetchWeatherData } from "../../redux/reducers/dataSlice";
 import { getUserLocation } from "../../helpers/getUserLocation";
-import { setLocation } from "../../redux/locationSlice";
+import { setLocation } from "../../redux/reducers/locationSlice";
 
 
 
@@ -46,6 +46,8 @@ export default function Home() {
     useEffect(() => {
         if (location) {
             dispatch(fetchWeatherData(location))
+        } else {
+            console.log("Location not found")
         }
     }, [location])
 
@@ -57,7 +59,7 @@ export default function Home() {
 
     return (
 
-        <main className="flex flex-col bg-gray-100">
+        <main className="flex flex-col bg-gray-100 max-w-screen">
             {/* <div className=" h-min-h py-5 flex items-center justify-center">
                 <form className="grid sm:grid-flow-col gap-2 max-md:w-[95%]" onSubmit={handleSubmit}>
                     <input type="text" className="h-10 rounded px-3 bg-[#DBE2EF] outline-none placeholder:text-white" value={location} name="location" placeholder="Search City" onChange={(e) => dispatch(setLocation(e.target.value))} />
