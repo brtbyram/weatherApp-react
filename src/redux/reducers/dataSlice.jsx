@@ -17,7 +17,7 @@ const year = date.getFullYear();
 
 export const fetchWeatherData = createAsyncThunk(
     "data/fetchWeatherData",
-    async (location ,{days = 3}) => {
+    async (location ,days = 3) => {
         const response = await axios.get(`https://api.weatherapi.com/v1/forecast.json?key=${import.meta.env.VITE_WEATHER_API}&q=${convertTurkishToEnglish(location)}&days=${days}&aqi=no&alerts=yes`);
         return response.data;
     }
