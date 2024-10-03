@@ -614,7 +614,11 @@ const Icon = ({ name, size = 24 }) => {
 
   const Component = icons[name]
 
-  return <Component size={size} />
+  return (
+    <div className='bg-black bg-opacity-10 rounded-lg p-2'>
+      <Component size={size} />
+    </div>
+  )
 
 }
 

@@ -5,9 +5,9 @@ import Header from "./components/header"
 
 function WebLayout() {
     return (
-        <div className="flex flex-col justify-between bg-[#F9F7F7]">
+        <div className="flex flex-col justify-between bg-[#F9F7F7] min-h-screen">
             <Header />
-            <main className="bg-[#DBE2EF]">
+            <main className="">
                 <Outlet />
             </main>
             <Footer />

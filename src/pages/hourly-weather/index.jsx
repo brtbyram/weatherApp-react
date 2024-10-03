@@ -1,40 +1,22 @@
-import { useEffect, useState } from 'react'
-import axios from 'axios'
-import { useSelector } from 'react-redux'
+import { useState } from 'react'
 import { Swiper, SwiperSlide } from 'swiper/react';
-import { convertTurkishToEnglish } from '../../helpers/convert-turkish-to-english'
 import moment from 'moment';
 import { Icon } from '../../Icons';
-import { Disclosure} from '@headlessui/react';
+import { Disclosure } from '@headlessui/react';
 import { useMediaQuery } from 'react-responsive'
 import clsx from 'clsx';
+import { useSelector } from 'react-redux';
 
 function HourlyWeather() {
   const isMobile = useMediaQuery({ query: '(max-width: 640px)' })
   const isTablet = useMediaQuery({ query: '(max-width: 1224px)' })
 
-  const [weatherData, setWeatherData] = useState(null)
   const [selectedHour, setSelectedHour] = useState(moment().format('YYYY-MM-DD HH') + ':00')
 
   const [open, setOpen] = useState(false)
 
-  const location = useSelector(state => state.location.value)
+  const weatherData = useSelector(state => state.data.weatherData)
 
-  const fetchData = async (location) => {
-    try {
-      const response = await axios.get(`http://api.weatherapi.com/v1/forecast.json?key=${import.meta.env.VITE_WEATHER_API}&q=${convertTurkishToEnglish(location)}&days=3&aqi=yes&alerts=yes`)
-      setWeatherData(response.data)
-      console.log(response.data)
-    } catch (error) {
-      console.log(error)
-    }
-  }
-
-  useEffect(() => {
-    if (location) {
-      fetchData(location);
-    }
-  }, [location]);
 
   const hourData = weatherData && weatherData.forecast.forecastday[0].hour.find(hour => moment(hour.time).format('YYYY-MM-DD HH') + ':00' === selectedHour)
 
@@ -87,7 +69,7 @@ function HourlyWeather() {
                   <h3 className='text-2xl'>Humidity: {hourData.humidity}%</h3>
                 </div>
               </div>
-              <Disclosure> 
+              <Disclosure>
                 {({ open }) => (
                   <div className={`${open && 'bg-gray-400/40 text-white'} bg-gray-400/30 border md:px-3 my-6 rounded-xl`}>
                     <Disclosure.Button onClick={() => setOpen(!open)} className="flex text-center text-xl justify-center items-center w-full p-4 outline-none ">

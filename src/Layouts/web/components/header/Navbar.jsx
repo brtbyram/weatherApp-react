@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom"
+import { Link, useLocation } from "react-router-dom"
 import { Menu } from '@headlessui/react'
 import clsx from "clsx"
 import { useMediaQuery } from 'react-responsive'
@@ -9,6 +9,8 @@ function Navbar() {
 
   const isDesktopOrLaptop = useMediaQuery({ query: '(min-width: 1224px)' })
   const isTabletOrMobile = useMediaQuery({ query: '(max-width: 1224px)' })
+
+  const location = useLocation()
 
   const links = [
     {
@@ -74,7 +76,9 @@ function Navbar() {
       {isDesktopOrLaptop && (
         <div>
           {links.map((link, index) => (
-            <Link key={index} to={link.path} className="text-white hover:border-b border-white  mx-2 px-1 py-1.5 rounded transition-all">{link.label}</Link>
+            <Link key={index} to={link.path} className={clsx("text-white hover:border-b border-white  mx-2 px-1 py-1.5 rounded transition-all", {
+              'border-b-2': location.pathname === link.path,
+            })}>{link.label}</Link>
           ))}
         </div>
       )}

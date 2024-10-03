@@ -1,6 +1,4 @@
-import axios from "axios"
-import { useEffect, useState } from "react"
-import { convertTurkishToEnglish } from "../../helpers/convert-turkish-to-english";
+import { useEffect } from "react"
 import moment from "moment";
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Disclosure, Transition } from '@headlessui/react'
@@ -11,8 +9,12 @@ import clsx from "clsx";
 import { Icon } from "../../Icons";
 import { useMediaQuery } from 'react-responsive'
 import { useSelector, useDispatch } from 'react-redux'
-import { setLocation } from "../../features/location/locationSlice";
 import TurkeyWeatherMap from "../../components/TurkeyMap";
+import StarsCanvas from "../../components/Stars";
+import { fetchWeatherData } from "../../redux/dataSlice";
+import { getUserLocation } from "../../helpers/getUserLocation";
+import { setLocation } from "../../redux/locationSlice";
+
 
 
 export default function Home() {
@@ -21,49 +23,37 @@ export default function Home() {
     // const isDesktopOrLaptop = useMediaQuery({ query: '(min-width: 1224px)' })
     //const isTablet = useMediaQuery({ query: '(max-width: 1224px)' })
 
-    const location = useSelector(state => state.location.value)
+    const location = useSelector(state => state.location.location)
+    const {loading, weatherData} = useSelector(state => state.data)
     const dispatch = useDispatch()
 
-    const [weatherData, setWeatherData] = useState(null)
 
 
     useEffect(() => {
-        // Kullanıcının konumunu al
-        if (navigator.geolocation) {
-            navigator.geolocation.getCurrentPosition(
-                async (position) => {
-                    const { latitude, longitude } = position.coords;
-                    try {
-                        const { data } = await axios.get(`https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${latitude}&longitude=${longitude}&localityLanguage=tr`);
-                        dispatch(setLocation(data.city))
-                        console.log(location)
-                    } catch (error) {
-                        console.log("Adres bilgisi alınamadı.");
-                    }
-                }
-            );
+        // Local storage'dan konumu al
+        const storedLocation = localStorage.getItem("location");
+        if (storedLocation) {
+            // Redux state'e kaydet
+            dispatch(setLocation(storedLocation));
+            console.log("storedLocation:", storedLocation)
+        } else {
+            // Eğer local storage'da yoksa, kullanıcıdan al
+            getUserLocation(dispatch);
         }
-    }, []);
+    }, [dispatch]);
 
 
     useEffect(() => {
-        const fetchWeatherData = async () => {
-            try {
-                const response = await axios.get(`https://api.weatherapi.com/v1/forecast.json?key=${import.meta.env.VITE_WEATHER_API}&q=${convertTurkishToEnglish(location)}&days=3&aqi=no&alerts=yes`)
-                setWeatherData(response.data)
-                console.log(response.data)
-            }
-            catch (error) {
-                console.log(error)
-            }
+        if (location) {
+            dispatch(fetchWeatherData(location))
         }
-        fetchWeatherData()
     }, [location])
 
-    // const handleSubmit = (e) => {
-    //     e.preventDefault()
-    //     console.log(location)
-    // }   
+
+    console.log("loading:", loading)
+    console.log("veri:", weatherData?.forecast?.forecastday)  // Hata veriyor çünkü veri yüklenene kadar boş bir array oluyor. Bu yüzden veri yüklendikten sonra kontrol etmek gerekiyor. bunun için weatherData?.forecast?.forecastday şeklinde kontrol yapılabilir. veya weatherData && weatherData.forecast?.forecastday şeklinde kontrol yapılabilir.)
+
+
 
     return (
 
@@ -74,57 +64,54 @@ export default function Home() {
                     <button type="submit" className="bg-[#112d4e] text-white p-2 rounded-lg">Search</button>
                 </form>
             </div> */}
-            {weatherData && (
+             {weatherData && (
                 <div className="w-full">
 
                     <div className="bg-[#F9F7F7] text-lg transition-all duration-700 delay-300">
-                        <div className={clsx(" p-10 w-full h-full bg-cover shadow-2xl", {
-                            "bg-[url(https://p4.wallpaperbetter.com/wallpaper/505/189/268/clear-sky-sky-blue-stars-4k-wallpaper-preview.jpg)]": weatherData.current.is_day === 1,
-                            "bg-[url(https://p4.wallpaperbetter.com/wallpaper/777/422/528/night-sky-wallpaper-preview.jpg)]": weatherData.current.is_day === 0
-
-                        })}>
-                            <div className="grid md:grid-cols-2 place-content-center place-items-center">
-                                <div className="flex justify-center items-center drop-shadow-2xl">
-                                    {weatherData.forecast.forecastday[0].hour.map((hour, index) => (
+                        <div className="relative" >
+                            <StarsCanvas />
+                            <div className="p-10 grid max-md:grid-cols-1 grid-cols-2 place-content-center place-items-center">
+                                <div className="flex w-full h-full max-sm:p-16 justify-center items-center drop-shadow-2xl">
+                                    {weatherData.forecast?.forecastday[0].hour.map((hour, index) => (
                                         <div key={index}>
                                             {moment(hour.time).format('H') === moment().format('H') && (
-                                                <div className="">
-                                                    <img width={200} className="z-10" src={hour.condition.icon} alt="" />
+                                                <div>
+                                                    <img width={isMobile ? 100 : 200} className="relative" src={hour.condition.icon} alt="" />
                                                 </div>
                                             )}
                                         </div>
                                     ))}
-                                    <div className="font-extrabold text-3xl text-zinc-100 z-10">
-                                        <h2 className="">{weatherData.current.temp_c} °C</h2>
-                                        <h2>{weatherData.location.name}</h2>
+                                    <div className="font-extrabold max-sm:text-2xl text-3xl text-zinc-100 z-10">
+                                        <h2>{weatherData.current?.temp_c} °C</h2>
+                                        <h2>{weatherData.location?.name}</h2>
                                     </div>
                                 </div>
-                                <div className="text-zinc-100 text-xl py-10 space-y-2">
+                                <div className="text-zinc-100 text-xl py-10 space-y-2 max-md:hidden z-10">
                                     <div className="flex items-center space-x-2">
                                         <Icon name="maxTemp" size="50" />
-                                        <div className="">Max Temp: {weatherData.forecast.forecastday[0].day.maxtemp_c}°C</div>
+                                        <div className="">Max Temp: {weatherData.forecast?.forecastday[0].day?.maxtemp_c}°C</div>
                                     </div>
                                     <div className="flex items-center space-x-2">
                                         <Icon name="minTemp" size="50" />
-                                        <h2 className="">Min Temp: {weatherData.forecast.forecastday[0].day.mintemp_c}°C</h2>
+                                        <h2 className="">Min Temp: {weatherData.forecast?.forecastday[0].day?.mintemp_c}°C</h2>
                                     </div>
 
                                     <div className="flex items-center space-x-2">
                                         <Icon name="humidity" size="50" />
-                                        <h2>Average Humidity: %{weatherData.forecast.forecastday[0].day.avghumidity}</h2>
+                                        <h2>Average Humidity: %{weatherData.forecast?.forecastday[0].day?.avghumidity}</h2>
                                     </div>
                                     <div className="flex items-center space-x-2">
                                         <Icon name="sunRise" size="50" />
-                                        <h2 className="">Sunrise: {weatherData.forecast.forecastday[0].astro.sunrise}</h2>
+                                        <h2 className="">Sunrise: {weatherData.forecast?.forecastday[0].astro?.sunrise}</h2>
                                     </div>
                                     <div className="flex items-center space-x-2">
                                         <Icon name="sunSet" size="50" />
-                                        <h2 className="">Sunset: {weatherData.forecast.forecastday[0].astro.sunset}</h2>
+                                        <h2 className="">Sunset: {weatherData.forecast?.forecastday[0].astro?.sunset}</h2>
                                     </div>
                                 </div>
                             </div>
                             <Disclosure>
-                                <Disclosure.Button className="py-2 text-white duration-700 transition-all font-semibold">
+                                <Disclosure.Button className="px-10 mb-10 text-white duration-700 transition-all font-semibold relative">
                                     More Details
                                 </Disclosure.Button>
                                 <Transition
@@ -135,49 +122,49 @@ export default function Home() {
                                     leaveFrom="transform scale-100 opacity-100"
                                     leaveTo="transform scale-95 opacity-0"
                                 >
-                                    <Disclosure.Panel className="text-white duration-700 transition-all">
-                                        <div className="grid md:grid-cols-2 gap-2 mt-8  text-lg">
+                                    <Disclosure.Panel className="text-white duration-700 transition-all p-10 pt-0">
+                                        <div className="grid md:grid-cols-2 gap-2 text-lg">
                                             <div className="flex items-center space-x-2 border-b md:mx-4 drop-shadow-lg">
                                                 <Icon name="uv" size="50" />
-                                                <h2 className="">UV: {weatherData.forecast.forecastday[0].day.uv}</h2>
+                                                <h2 className="">UV: {weatherData.forecast?.forecastday[0].day?.uv}</h2>
                                             </div>
 
 
                                             <div className="flex items-center space-x-2 border-b md:mx-4 drop-shadow-lg">
                                                 <Icon name="windy" size="50" />
-                                                <h2 className="">Max Wind: {weatherData.forecast.forecastday[0].day.maxwind_kph} km/h</h2>
+                                                <h2 className="">Max Wind: {weatherData.forecast?.forecastday[0].day?.maxwind_kph} km/h</h2>
                                             </div>
                                             <div className="flex items-center space-x-2 border-b md:mx-4 drop-shadow-lg">
                                                 <Icon name="autoTemp" size="50" />
-                                                <h2 className="">Avg Temp: {weatherData.forecast.forecastday[0].day.avgtemp_c}°C</h2>
+                                                <h2 className="">Avg Temp: {weatherData.forecast?.forecastday[0].day?.avgtemp_c}°C</h2>
                                             </div>
                                             <div className="flex items-center space-x-2 border-b md:mx-4 drop-shadow-lg">
                                                 <span className="material-symbols-outlined">compress</span>
-                                                <h2 className="">Average Pressure: {weatherData.forecast.forecastday[0].day.avgtemp_c} mb</h2>
+                                                <h2 className="">Average Pressure: {weatherData.forecast?.forecastday[0].day?.avgtemp_c} mb</h2>
                                             </div>
                                             <div className="flex items-center space-x-2 border-b md:mx-4 drop-shadow-lg">
                                                 <span className="material-symbols-outlined">rainy</span>
-                                                <h2 className="">Chance of Rain: %{weatherData.forecast.forecastday[0].day.daily_chance_of_rain}</h2>
+                                                <h2 className="">Chance of Rain: %{weatherData.forecast?.forecastday[0].day?.daily_chance_of_rain}</h2>
                                             </div>
                                             <div className="flex items-center space-x-2 border-b md:mx-4 drop-shadow-lg">
                                                 <Icon name="moonSet" size="50" />
-                                                <h2 className="">Moonset: {weatherData.forecast.forecastday[0].astro.moonset}</h2>
+                                                <h2 className="">Moonset: {weatherData.forecast?.forecastday[0].astro?.moonset}</h2>
                                             </div>
                                             <div className="flex items-center space-x-2 border-b md:mx-4 drop-shadow-lg">
                                                 <Icon name="moonSet" size="50" />
-                                                <h2 className="">Moon Phase: {weatherData.forecast.forecastday[0].astro.moon_phase}</h2>
+                                                <h2 className="">Moon Phase: {weatherData.forecast?.forecastday[0].astro?.moon_phase}</h2>
                                             </div>
                                             <div className="flex items-center space-x-2 border-b md:mx-4 drop-shadow-lg">
                                                 <Icon name="moonSet" size="50" />
-                                                <h2 className="">Condition: {weatherData.forecast.forecastday[0].day.condition.text}</h2>
+                                                <h2 className="">Condition: {weatherData.forecast?.forecastday[0].day.condition?.text}</h2>
                                             </div>
                                             <div className="flex items-center space-x-2 border-b md:mx-4 drop-shadow-lg">
                                                 <Icon name="moonSet" size="50" />
-                                                <h2 className="">Moon Illumination: {weatherData.forecast.forecastday[0].astro.moon_illumination}</h2>
+                                                <h2 className="">Moon Illumination: {weatherData.forecast?.forecastday[0].astro?.moon_illumination}</h2>
                                             </div>
                                             <div className="flex items-center space-x-2 border-b md:mx-4 drop-shadow-lg">
                                                 <Icon name="moonSet" size="50" />
-                                                <h2 className="">Moonrise: {weatherData.forecast.forecastday[0].astro.moonrise}</h2>
+                                                <h2 className="">Moonrise: {weatherData.forecast?.forecastday[0].astro?.moonrise}</h2>
                                             </div>
                                         </div>
                                     </Disclosure.Panel>
@@ -199,7 +186,7 @@ export default function Home() {
                             onSwiper={(swiper) => console.log(swiper)}
                             className="w-full pb-10"
                         >
-                            {weatherData.forecast.forecastday.map((day) => (
+                            {weatherData.forecast?.forecastday.map((day) => (
                                 <SwiperSlide key={day.date} className="flex justify-center border-black items-center text-center px-1">
                                     <div className={clsx("flex flex-col border items-center font-medium px-4 pb-5 text-md justify-start w-60 h-80 bg-[#F9F7F7] opacity-85", {
                                         "!bg-[#112D4e] text-white": moment(day.date).format('DD') === moment().format('DD')
@@ -228,14 +215,14 @@ export default function Home() {
                             onSwiper={(swiper) => console.log(swiper)}
                             className=" rounded p-10 text-lg"
                         >
-                            {weatherData.forecast.forecastday[0].hour.map((hour, index) => (
+                            {weatherData.forecast?.forecastday[0].hour.map((hour, index) => (
                                 <SwiperSlide key={index} className="flex  flex-col items-center justify-center mx-auto w-24">
                                     <div className={clsx("rounded", {
-                                        "bg-[#3F72AF] text-white p-5": moment(hour.time).format('H') === moment().format('H'),
+                                        "bg-[#3F72AF] text-white p-5": moment(hour?.time).format('H') === moment().format('H'),
                                     })}>
-                                        <img width={60} height={60} src={hour.condition.icon} alt={hour.condition.text} />
-                                        <h6>{hour.temp_c} °C</h6>
-                                        <h6>{moment(hour.time).format('LT')}</h6>
+                                        <img width={60} height={60} src={hour?.condition?.icon} alt={hour?.condition?.text} />
+                                        <h6>{hour?.temp_c} °C</h6>
+                                        <h6>{moment(hour?.time).format('LT')}</h6>
                                     </div>
                                 </SwiperSlide>
                             ))
@@ -247,14 +234,14 @@ export default function Home() {
                         {weatherData.alerts && (
                             weatherData.alerts.alert.map((alert, index) => (
                                 <div key={index} className="bg-[#F9F7F7] rounded-lg mt-10 text-lg p-10">
-                                    <h1 className="font-semibold">{alert.headline}</h1>
-                                    <h2>Areas: {alert.areas}</h2>
-                                    <h2>Description: {alert.desc}</h2>
-                                    <h2>Category: {alert.category}</h2>
-                                    <h2>Severity: {alert.severity}</h2>
-                                    <h2>Note: {alert.note}</h2>
-                                    <h2>Effective: {moment(alert.effective).format("YYYY-MM-GG HH:MM")}</h2>
-                                    <h2>Expires: {moment(alert.expires).format("YYYY-MM-GG HH:MM")}</h2>
+                                    <h1 className="font-semibold">{alert?.headline}</h1>
+                                    <h2>Areas: {alert?.areas}</h2>
+                                    <h2>Description: {alert?.desc}</h2>
+                                    <h2>Category: {alert?.category}</h2>
+                                    <h2>Severity: {alert?.severity}</h2>
+                                    <h2>Note: {alert?.note}</h2>
+                                    <h2>Effective: {moment(alert?.effective).format("YYYY-MM-GG HH:MM")}</h2>
+                                    <h2>Expires: {moment(alert?.expires).format("YYYY-MM-GG HH:MM")}</h2>
                                 </div>
                             ))
                         )}
@@ -263,6 +250,14 @@ export default function Home() {
                 </div>
             )}
 
+
+            {
+                weatherData && (
+                    <div>
+                        sdsda
+                    </div>
+                )
+            }
             <TurkeyWeatherMap />
 
         </main>

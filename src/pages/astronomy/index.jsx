@@ -1,6 +1,5 @@
-import axios from 'axios'
 import moment from 'moment'
-import { useEffect, useState } from 'react'
+import { useEffect } from 'react'
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Parallax } from 'swiper/modules';
 import clsx from 'clsx';
@@ -8,36 +7,26 @@ import { useMediaQuery } from 'react-responsive'
 import 'swiper/css';
 import { Icon } from '../../Icons';
 import StarsCanvas from '../../components/Stars';
+import { useSelector, useDispatch } from 'react-redux'
+import { fetchAstronomyData } from '../../redux/dataSlice'
 
 
 function Astronomy() {
 
   const isDesktopOrLaptop = useMediaQuery({ query: '(min-width: 1224px)' })
 
-  const [astronomyData, setAstronomyData] = useState(null)
-
-  const day = moment().format('D')
-  const month = moment().format('M')
-  const year = moment().format('YYYY')
-
-  const fetchAstronomyData = async () => {
-    try {
-      const response = await axios.get(`https://moonphases.co.uk/service/getMoonDetails.php?day=${day}&month=${month}&year=${year}&lat=12.9960448&lng=29.147136&len=30&tz=0`)
-      setAstronomyData(response.data)
-      console.log(response.data)
-    } catch (error) {
-      console.log(error)
-    }
-  }
+  const { astronomyData, weatherData } = useSelector((state) => state.data)
+  const dispatch = useDispatch()
 
   useEffect(() => {
-    fetchAstronomyData()
-  }, [])
+    dispatch(fetchAstronomyData(weatherData.location.lat, weatherData.location.lon))
+  }, [weatherData.location.lat, weatherData.location.lon])
 
+  console.log(astronomyData)
 
   return (
-    <div className="relative bg-transparent z-1">
-        <StarsCanvas />
+    <div className="relative">
+      <StarsCanvas />
       <div>
         {astronomyData && (
           <div >
@@ -55,7 +44,7 @@ function Astronomy() {
               onSwiper={(swiper) => console.log(swiper)}
               className="rounded p-10 text-lg h-full"
             >
-              {astronomyData.days.map((day, index) => {
+              {astronomyData?.days?.map((day, index) => {
                 return (
                   <SwiperSlide key={index}>
                     {({ isActive }) => (

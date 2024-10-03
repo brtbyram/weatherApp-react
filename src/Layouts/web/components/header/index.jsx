@@ -7,6 +7,8 @@ function Header() {
 
     const isMobile = useMediaQuery({ query: '(max-width: 640px)' })
 
+    
+
     return (
         <header className="bg-[#112D4E] z-20 top-0 sticky w-full text-white min-h-24 flex items-center justify-around">
             <Logo/>
