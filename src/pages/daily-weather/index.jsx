@@ -1,5 +1,6 @@
-import axios from "axios"
-import { useEffect, useState } from "react"
+import { useState } from "react"
+import { fetchWeatherData } from "../../redux/reducers/dataSlice";
+import { useDispatch, useSelector } from "react-redux";
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Navigation, Pagination, A11y } from 'swiper/modules';
 import clsx from "clsx";
@@ -8,50 +9,30 @@ import { useMediaQuery } from 'react-responsive'
 import 'swiper/css';
 import 'swiper/css/navigation';
 import 'swiper/css/pagination';
-import { convertTurkishToEnglish } from "../../helpers/convert-turkish-to-english";
 import { Icon } from "../../Icons";
+import { ErrorMessage, Field, Form, Formik } from "formik";
 
 
 export default function DailyWeather() {
 
+    const { weatherData } = useSelector(state => state.data)
+    const dispatch = useDispatch()
+
     const isMobile = useMediaQuery({ query: '(max-width: 640px)' })
     const isTablet = useMediaQuery({ query: '(max-width: 1224px)' })
 
-    const [location, setLocation] = useState()
-    const [dayNumbers, setDayNumbers] = useState()
+
+    const [dayNumbers, setDayNumbers] = useState("3")
 
     const [forecastIndex, setForecastIndex] = useState(0)
 
-    const [weatherData, setWeatherData] = useState(null)
-    const [formData, setFormData] = useState({
-        location: "trabzon",
-        dayNumbers: 3
-    })
 
-    const fetchData = async (location, dayNumbers) => {
-        try {
-            const response = await axios.get(`http://api.weatherapi.com/v1/forecast.json?key=${import.meta.env.VITE_WEATHER_API}&q=${convertTurkishToEnglish(location)}&days=${dayNumbers}&aqi=yes&alerts=yes`)
-            setWeatherData(response.data)
-            console.log(response.data)
-        } catch (error) {
-            console.log(error)
-        }
+
+    const handleSubmit = (values) => {
+        dispatch(fetchWeatherData(values.location , {...values.numberOfDays} ))
+        setDayNumbers(values.numberOfDays)
     }
 
-    const handleSubmit = (e) => {
-        e.preventDefault()
-        setFormData({
-            location,
-            dayNumbers
-        })
-    }
-
-
-    useEffect(() => {
-        if (formData.location && formData.dayNumbers) {
-            fetchData(formData.location, formData.dayNumbers)
-        }
-    }, [formData])
 
 
     const forecastData = weatherData && weatherData.forecast.forecastday[forecastIndex]
@@ -65,11 +46,39 @@ export default function DailyWeather() {
 
         <main className="h-full bg-gray-100">
             <div className="py-5 flex items-center justify-center">
-                <form className="grid sm:grid-flow-col gap-2 max-md:w-[95%]" onSubmit={handleSubmit}>
-                    <input type="text" className="h-10 rounded px-3" value={location} name="location" placeholder="Şehir giriniz" onChange={(e) => setLocation(e.target.value)} />
-                    <input type="number" min={0} max={3} className="h-10 rounded px-3" value={dayNumbers} name="dayNumbers" placeholder="Gün sayısı giriniz" onChange={(e) => setDayNumbers(e.target.value)} />
-                    <button type="submit" className="bg-blue-900/90 text-white p-2 rounded-lg">Gönder</button>
-                </form>
+
+
+                <Formik
+                    initialValues={{ location: "" , numberOfDays : "" }}
+                    validate={values => {
+                        const errors = {};
+                        if (!values.location) {
+                            errors.location = 'Required';
+                        }
+                        if (!values.numberOfDays) {
+                            errors.numberOfDays = 'Required';
+                        }
+                        return errors;
+                    }}
+                    onSubmit={handleSubmit}
+                >
+                    {() => (
+                        <Form className="gap-3 justify-center py-5 items-center flex flex-col">
+                            <label htmlFor="location">
+                                <Field id="location" type="text" name="location" className="h-10 w-96 rounded px-3" placeholder="Şehir giriniz" />
+                                <ErrorMessage name="location" component="div" />
+                            </label>
+                            <label htmlFor="numberOfDays">
+                                <Field type="number" name="numberOfDays" min={0} max={3} placeholder="Gün sayısı giriniz" className="h-10 w-96 rounded px-3" />
+                                <ErrorMessage name="numberOfDays" component="div" />
+                            </label>
+
+                            <button type="submit" className=" text-white flex items-center justify-center w-64 mx-auto px-6 py-4 duration-700 transition-all font-semibold border rounded-xl bg-gray-100/10">
+                                Search
+                            </button>
+                        </Form>
+                    )}
+                </Formik>
             </div>
             {weatherData && (
                 <div>
@@ -81,7 +90,7 @@ export default function DailyWeather() {
                             <h4>{weatherData.current.condition.text}</h4>
                         </div>
                         <div className="flex flex-col justify-center items-center">
-                            <h2 className="text-xl font-bold p-5">{formData.dayNumbers} Day Forecast</h2>
+                            <h2 className="text-xl font-bold p-5">{dayNumbers} Day Forecast</h2>
                             <Swiper
                                 modules={[Navigation, Pagination, A11y]}
                                 spaceBetween={0}
@@ -286,8 +295,6 @@ export default function DailyWeather() {
                 </div>
             )
             }
-
-            <marquee className='text-white bg-blue-900/90 p-5'>Bu sayfa geliştirme aşamasındadır. Lütfen daha sonra tekrar deneyiniz.</marquee>
         </main>
     )
 }

@@ -8,7 +8,7 @@ import 'swiper/css';
 import { Icon } from '../../Icons';
 import StarsCanvas from '../../components/Stars';
 import { useSelector, useDispatch } from 'react-redux'
-import { fetchAstronomyData } from '../../redux/dataSlice'
+import { fetchAstronomyData } from '../../redux/reducers/dataSlice';
 
 
 function Astronomy() {

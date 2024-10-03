@@ -1,5 +1,5 @@
 import { useDispatch } from 'react-redux'
-import { setLocation } from "../../../../redux/locationSlice"
+import { setLocation } from "../../../../redux/reducers/locationSlice"
 import { Icon } from "../../../../Icons"
 import { useState } from 'react'
 

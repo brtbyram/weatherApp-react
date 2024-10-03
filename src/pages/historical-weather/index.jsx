@@ -5,7 +5,7 @@ import { useSelector, useDispatch } from 'react-redux'
 import { Disclosure, Transition } from "@headlessui/react"
 import { useMediaQuery } from 'react-responsive'
 import Button from "../../components/button"
-import { fetchHistoricalWeatherData } from "../../redux/dataSlice"
+import { fetchHistoricalWeatherData } from "../../redux/reducers/dataSlice"
 
 function HistoricalWeather() {
 
@@ -17,20 +17,9 @@ function HistoricalWeather() {
   //  const isTablet = useMediaQuery({ query: '(max-width: 1224px)' })
 
 
-  console.log(moment().format('YYYY-MM-DD'))
-
-  console.log("location :", location)
-  console.log("historicalWeatherData :", historicalWeatherData)
-
-
   const handleSubmit = (values) => {
-    console.log("values :", values)
     dispatch(fetchHistoricalWeatherData(values))
   }
-
-
-  console.log("historical data :", historicalWeatherData)
-
 
   return (
     <div className="bg-white h-full scroll-auto">
