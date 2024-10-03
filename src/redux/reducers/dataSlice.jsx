@@ -18,7 +18,7 @@ const year = date.getFullYear();
 export const fetchWeatherData = createAsyncThunk(
     "data/fetchWeatherData",
     async (location ,{days = 3}) => {
-        const response = await axios.get(`http://api.weatherapi.com/v1/forecast.json?key=${import.meta.env.VITE_WEATHER_API}&q=${convertTurkishToEnglish(location)}&days=${days}&aqi=no&alerts=yes`);
+        const response = await axios.get(`https://api.weatherapi.com/v1/forecast.json?key=${import.meta.env.VITE_WEATHER_API}&q=${convertTurkishToEnglish(location)}&days=${days}&aqi=no&alerts=yes`);
         return response.data;
     }
 );
@@ -26,7 +26,7 @@ export const fetchWeatherData = createAsyncThunk(
 export const fetchHistoricalWeatherData = createAsyncThunk(
     "data/fetchHistoricalWeatherData",
     async ({location, date}) => {
-        const response = await axios.get(`http://api.weatherapi.com/v1/history.json?key=${import.meta.env.VITE_WEATHER_API}&q=${convertTurkishToEnglish(location)}&dt=${date}`);
+        const response = await axios.get(`https://api.weatherapi.com/v1/history.json?key=${import.meta.env.VITE_WEATHER_API}&q=${convertTurkishToEnglish(location)}&dt=${date}`);
         return response.data;
     }
 );
