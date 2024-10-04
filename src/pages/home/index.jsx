@@ -24,7 +24,7 @@ export default function Home() {
     //const isTablet = useMediaQuery({ query: '(max-width: 1224px)' })
 
     const location = useSelector(state => state.location.location)
-    const {loading, weatherData} = useSelector(state => state.data)
+    const { loading, weatherData } = useSelector(state => state.data)
     const dispatch = useDispatch()
 
 
@@ -66,19 +66,24 @@ export default function Home() {
                     <button type="submit" className="bg-[#112d4e] text-white p-2 rounded-lg">Search</button>
                 </form>
             </div> */}
-             {weatherData && (
+            {weatherData && (
                 <div className="w-full">
 
                     <div className="bg-[#F9F7F7] text-lg transition-all duration-700 delay-300">
-                        <div className="relative" >
-                            <StarsCanvas />
-                            <div className="p-10 grid max-md:grid-cols-1 grid-cols-2 place-content-center place-items-center">
-                                <div className="flex w-full h-full max-sm:p-16 justify-center items-center drop-shadow-2xl">
+                        <div className="relative flex flex-col justify-center rounded-xl bg-black" >
+                                <StarsCanvas />
+                            <div className="p-10 relative grid max-md:grid-cols-1 grid-cols-2 place-content-center place-items-center">
+                                <div className="flex flex-col w-full h-full max-sm:p-16 justify-center items-center drop-shadow-2xl">
                                     {weatherData.forecast?.forecastday[0].hour.map((hour, index) => (
                                         <div key={index}>
                                             {moment(hour.time).format('H') === moment().format('H') && (
                                                 <div>
-                                                    <img width={isMobile ? 100 : 200} className="relative" src={hour.condition.icon} alt="" />
+                                                    <img
+                                                        width={!isMobile ? 300 : 400}
+                                                        className="relative contrast-125 hover:contrast-150"
+                                                        src={hour.condition.icon}
+                                                        alt={hour.condition.text}
+                                                    />
                                                 </div>
                                             )}
                                         </div>
@@ -88,7 +93,7 @@ export default function Home() {
                                         <h2>{weatherData.location?.name}</h2>
                                     </div>
                                 </div>
-                                <div className="text-zinc-100 text-xl py-10 space-y-2 max-md:hidden z-10">
+                                <div className="text-zinc-100 opacity-80 text-xl py-10 space-y-2 max-md:hidden z-10">
                                     <div className="flex items-center space-x-2">
                                         <Icon name="maxTemp" size="50" />
                                         <div className="">Max Temp: {weatherData.forecast?.forecastday[0].day?.maxtemp_c}°C</div>
@@ -113,71 +118,73 @@ export default function Home() {
                                 </div>
                             </div>
                             <Disclosure>
-                                <Disclosure.Button className="px-10 mb-10 text-white duration-700 transition-all font-semibold relative">
-                                    More Details
-                                </Disclosure.Button>
-                                <Transition
-                                    enter="transition duration-500 ease-out"
-                                    enterFrom="transform scale-95 opacity-0"
-                                    enterTo="transform scale-100 opacity-100"
-                                    leave="transition duration-300 ease-out"
-                                    leaveFrom="transform scale-100 opacity-100"
-                                    leaveTo="transform scale-95 opacity-0"
-                                >
-                                    <Disclosure.Panel className="text-white duration-700 transition-all p-10 pt-0">
-                                        <div className="grid md:grid-cols-2 gap-2 text-lg">
-                                            <div className="flex items-center space-x-2 border-b md:mx-4 drop-shadow-lg">
-                                                <Icon name="uv" size="50" />
-                                                <h2 className="">UV: {weatherData.forecast?.forecastday[0].day?.uv}</h2>
-                                            </div>
+                                {({ open }) => (
+                                    <div className="flex flex-col mx-auto opacity-80 py-8 md:py-5 shadow-xl drop-shadow-2xl">
+                                        <Disclosure.Button className="px-16 mx-auto md:m-5 shadow-xl drop-shadow-xl bg-[#112d4e] bg-opacity-85 border rounded-md py-7 text-white duration-700 outline-none transition-all font-semibold relative">
+                                            {open ? 'Hide Details' : 'Show Details'}
+                                        </Disclosure.Button>
+                                        <Transition
+                                            enter="transition duration-500 ease-out"
+                                            enterFrom="transform scale-95 opacity-0"
+                                            enterTo="transform scale-100 opacity-100"
+                                            leave="transition duration-300 ease-out"
+                                            leaveFrom="transform scale-100 opacity-100"
+                                            leaveTo="transform scale-95 opacity-0"
+                                        >
+                                            <Disclosure.Panel className="text-white duration-700 transition-all p-10 pt-4">
+                                                <div className="grid md:grid-cols-2 gap-2 text-lg">
+                                                    <div className="flex items-center space-x-2 border-b md:mx-4 drop-shadow-lg">
+                                                        <Icon name="uv" size="50" />
+                                                        <h2 className="">UV: {weatherData.forecast?.forecastday[0].day?.uv}</h2>
+                                                    </div>
 
 
-                                            <div className="flex items-center space-x-2 border-b md:mx-4 drop-shadow-lg">
-                                                <Icon name="windy" size="50" />
-                                                <h2 className="">Max Wind: {weatherData.forecast?.forecastday[0].day?.maxwind_kph} km/h</h2>
-                                            </div>
-                                            <div className="flex items-center space-x-2 border-b md:mx-4 drop-shadow-lg">
-                                                <Icon name="autoTemp" size="50" />
-                                                <h2 className="">Avg Temp: {weatherData.forecast?.forecastday[0].day?.avgtemp_c}°C</h2>
-                                            </div>
-                                            <div className="flex items-center space-x-2 border-b md:mx-4 drop-shadow-lg">
-                                                <span className="material-symbols-outlined">compress</span>
-                                                <h2 className="">Average Pressure: {weatherData.forecast?.forecastday[0].day?.avgtemp_c} mb</h2>
-                                            </div>
-                                            <div className="flex items-center space-x-2 border-b md:mx-4 drop-shadow-lg">
-                                                <span className="material-symbols-outlined">rainy</span>
-                                                <h2 className="">Chance of Rain: %{weatherData.forecast?.forecastday[0].day?.daily_chance_of_rain}</h2>
-                                            </div>
-                                            <div className="flex items-center space-x-2 border-b md:mx-4 drop-shadow-lg">
-                                                <Icon name="moonSet" size="50" />
-                                                <h2 className="">Moonset: {weatherData.forecast?.forecastday[0].astro?.moonset}</h2>
-                                            </div>
-                                            <div className="flex items-center space-x-2 border-b md:mx-4 drop-shadow-lg">
-                                                <Icon name="moonSet" size="50" />
-                                                <h2 className="">Moon Phase: {weatherData.forecast?.forecastday[0].astro?.moon_phase}</h2>
-                                            </div>
-                                            <div className="flex items-center space-x-2 border-b md:mx-4 drop-shadow-lg">
-                                                <Icon name="moonSet" size="50" />
-                                                <h2 className="">Condition: {weatherData.forecast?.forecastday[0].day.condition?.text}</h2>
-                                            </div>
-                                            <div className="flex items-center space-x-2 border-b md:mx-4 drop-shadow-lg">
-                                                <Icon name="moonSet" size="50" />
-                                                <h2 className="">Moon Illumination: {weatherData.forecast?.forecastday[0].astro?.moon_illumination}</h2>
-                                            </div>
-                                            <div className="flex items-center space-x-2 border-b md:mx-4 drop-shadow-lg">
-                                                <Icon name="moonSet" size="50" />
-                                                <h2 className="">Moonrise: {weatherData.forecast?.forecastday[0].astro?.moonrise}</h2>
-                                            </div>
-                                        </div>
-                                    </Disclosure.Panel>
-                                </Transition>
+                                                    <div className="flex items-center space-x-2 border-b md:mx-4 drop-shadow-lg">
+                                                        <Icon name="windy" size="50" />
+                                                        <h2 className="">Max Wind: {weatherData.forecast?.forecastday[0].day?.maxwind_kph} km/h</h2>
+                                                    </div>
+                                                    <div className="flex items-center space-x-2 border-b md:mx-4 drop-shadow-lg">
+                                                        <Icon name="autoTemp" size="50" />
+                                                        <h2 className="">Avg Temp: {weatherData.forecast?.forecastday[0].day?.avgtemp_c}°C</h2>
+                                                    </div>
+                                                    <div className="flex items-center space-x-2 border-b md:mx-4 drop-shadow-lg">
+                                                        <span className="material-symbols-outlined">compress</span>
+                                                        <h2 className="">Average Pressure: {weatherData.forecast?.forecastday[0].day?.avgtemp_c} mb</h2>
+                                                    </div>
+                                                    <div className="flex items-center space-x-2 border-b md:mx-4 drop-shadow-lg">
+                                                        <span className="material-symbols-outlined">rainy</span>
+                                                        <h2 className="">Chance of Rain: %{weatherData.forecast?.forecastday[0].day?.daily_chance_of_rain}</h2>
+                                                    </div>
+                                                    <div className="flex items-center space-x-2 border-b md:mx-4 drop-shadow-lg">
+                                                        <Icon name="moonSet" size="50" />
+                                                        <h2 className="">Moonset: {weatherData.forecast?.forecastday[0].astro?.moonset}</h2>
+                                                    </div>
+                                                    <div className="flex items-center space-x-2 border-b md:mx-4 drop-shadow-lg">
+                                                        <Icon name="moonSet" size="50" />
+                                                        <h2 className="">Moon Phase: {weatherData.forecast?.forecastday[0].astro?.moon_phase}</h2>
+                                                    </div>
+                                                    <div className="flex items-center space-x-2 border-b md:mx-4 drop-shadow-lg">
+                                                        <Icon name="moonSet" size="50" />
+                                                        <h2 className="">Condition: {weatherData.forecast?.forecastday[0].day.condition?.text}</h2>
+                                                    </div>
+                                                    <div className="flex items-center space-x-2 border-b md:mx-4 drop-shadow-lg">
+                                                        <Icon name="moonSet" size="50" />
+                                                        <h2 className="">Moon Illumination: {weatherData.forecast?.forecastday[0].astro?.moon_illumination}</h2>
+                                                    </div>
+                                                    <div className="flex items-center space-x-2 border-b md:mx-4 drop-shadow-lg">
+                                                        <Icon name="moonSet" size="50" />
+                                                        <h2 className="">Moonrise: {weatherData.forecast?.forecastday[0].astro?.moonrise}</h2>
+                                                    </div>
+                                                </div>
+                                            </Disclosure.Panel>
+                                        </Transition>
+                                    </div>
+                                )}
                             </Disclosure>
                         </div>
-
-
                     </div>
 
-                    <div className="bg-[#F9F7F7] container mx-auto rounded-lg mt-10 text-lg flex flex-col items-center relative mb-10">
+                    <div className="bg-[#F9F7F7] drop-shadow-2xl container mx-auto rounded-lg mt-10 text-lg flex flex-col items-center relative mb-10">
                         <h1 className="flex justify-center font-extrabold text-3xl text-[#F9F7F7] mb-5 pt-10 z-10">3 Day Forecast</h1>
                         <Swiper
                             spaceBetween={-20}
@@ -205,7 +212,7 @@ export default function Home() {
                         <img className="w-full h-full absolute opacity-50 rounded-lg" src="https://t4.ftcdn.net/jpg/02/66/38/15/360_F_266381525_alVrbw15u5EjhIpoqqa1eI5ghSf7hpz7.jpg" alt="" />
                     </div>
 
-                    <div className="bg-[#F9F7F7] container mx-auto rounded-lg mt-10 text-lg p-10">
+                    <div className="bg-[#F9F7F7] drop-shadow-2xl container mx-auto rounded-lg mt-10 text-lg p-10">
                         <h1 className="flex item-start font-semibold text-xl p-10">Saatlik Tahmin</h1>
                         <Swiper
                             spaceBetween={0}
