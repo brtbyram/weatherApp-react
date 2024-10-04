@@ -51,7 +51,7 @@ function Navbar() {
     <nav className="flex items-center text-lg">
       {isTabletOrMobile && (
         <Menu>
-          <Menu.Button className="relative">
+          <Menu.Button id="menu" className="relative">
             <Icon name="menu" size="32" />
           </Menu.Button>
           <Menu.Items className="flex flex-col absolute right-1 top-20 md:right-20 bg-white w-[200px] z-10 rounded-md">
