@@ -41,6 +41,13 @@ export default function DailyWeather() {
 
     console.log(forecastIndex)
 
+    if (!weatherData) {
+        return (
+            <div>
+                <h1>Weather Data Not Found</h1>
+            </div>
+        )
+    }
 
     return (
 
