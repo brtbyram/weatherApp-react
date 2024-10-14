@@ -9,11 +9,11 @@ import clsx from "clsx";
 import { Icon } from "../../Icons";
 import { useMediaQuery } from 'react-responsive'
 import { useSelector, useDispatch } from 'react-redux'
-import TurkeyWeatherMap from "../../components/TurkeyMap";
 import StarsCanvas from "../../components/Stars";
 import { fetchWeatherData } from "../../redux/reducers/dataSlice";
 import { getUserLocation } from "../../helpers/getUserLocation";
 import { setLocation } from "../../redux/reducers/locationSlice";
+import HourlyChart from "../../components/charts/HourlyChart";
 
 
 
@@ -70,57 +70,60 @@ export default function Home() {
                 <div className="w-full">
 
                     <div className="bg-[#F9F7F7] text-lg transition-all duration-700 delay-300">
-                        <div className="relative flex flex-col justify-center rounded-xl bg-black" >
+                        <div className="flex flex-col justify-center rounded-xl bg-[#173a63]" >
+                            <div className="relative">
                                 <StarsCanvas />
-                            <div className="p-10 relative grid max-md:grid-cols-1 grid-cols-2 place-content-center place-items-center">
-                                <div className="flex flex-col w-full h-full max-sm:p-16 justify-center items-center drop-shadow-2xl">
-                                    {weatherData.forecast?.forecastday[0].hour.map((hour, index) => (
-                                        <div key={index}>
-                                            {moment(hour.time).format('H') === moment().format('H') && (
-                                                <div>
-                                                    <img
-                                                        width={!isMobile ? 300 : 400}
-                                                        className="relative contrast-125 hover:contrast-150"
-                                                        src={hour.condition.icon}
-                                                        alt={hour.condition.text}
-                                                    />
-                                                </div>
-                                            )}
+                                <div className="p-10 relative grid max-md:grid-cols-1 grid-cols-2 place-content-center place-items-center">
+                                    <div className="flex flex-col w-full h-full max-sm:p-16 justify-center items-center drop-shadow-2xl">
+                                        {weatherData.forecast?.forecastday[0].hour.map((hour, index) => (
+                                            <div key={index}>
+                                                {moment(hour.time).format('H') === moment().format('H') && (
+                                                    <div>
+                                                        <img
+                                                            width={!isMobile ? 300 : 400}
+                                                            className="relative contrast-125 hover:contrast-150"
+                                                            src={hour.condition.icon}
+                                                            alt={hour.condition.text}
+                                                        />
+                                                    </div>
+                                                )}
+                                            </div>
+                                        ))}
+                                        <div className="font-extrabold max-sm:text-2xl text-3xl text-zinc-100 z-10">
+                                            <h2>{weatherData.current?.temp_c} °C</h2>
+                                            <h2>{weatherData.location?.name}</h2>
                                         </div>
-                                    ))}
-                                    <div className="font-extrabold max-sm:text-2xl text-3xl text-zinc-100 z-10">
-                                        <h2>{weatherData.current?.temp_c} °C</h2>
-                                        <h2>{weatherData.location?.name}</h2>
                                     </div>
-                                </div>
-                                <div className="text-zinc-100 opacity-80 text-xl py-10 space-y-2 max-md:hidden z-10">
-                                    <div className="flex items-center space-x-2">
-                                        <Icon name="maxTemp" size="50" />
-                                        <div className="">Max Temp: {weatherData.forecast?.forecastday[0].day?.maxtemp_c}°C</div>
-                                    </div>
-                                    <div className="flex items-center space-x-2">
-                                        <Icon name="minTemp" size="50" />
-                                        <h2 className="">Min Temp: {weatherData.forecast?.forecastday[0].day?.mintemp_c}°C</h2>
-                                    </div>
+                                    <div className="text-zinc-100 opacity-80 text-xl py-10 space-y-2 max-md:hidden z-10">
+                                        <div className="flex items-center space-x-2">
+                                            <Icon name="maxTemp" size="50" />
+                                            <div className="">Max Temp: {weatherData.forecast?.forecastday[0].day?.maxtemp_c}°C</div>
+                                        </div>
+                                        <div className="flex items-center space-x-2">
+                                            <Icon name="minTemp" size="50" />
+                                            <h2 className="">Min Temp: {weatherData.forecast?.forecastday[0].day?.mintemp_c}°C</h2>
+                                        </div>
 
-                                    <div className="flex items-center space-x-2">
-                                        <Icon name="humidity" size="50" />
-                                        <h2>Average Humidity: %{weatherData.forecast?.forecastday[0].day?.avghumidity}</h2>
-                                    </div>
-                                    <div className="flex items-center space-x-2">
-                                        <Icon name="sunRise" size="50" />
-                                        <h2 className="">Sunrise: {weatherData.forecast?.forecastday[0].astro?.sunrise}</h2>
-                                    </div>
-                                    <div className="flex items-center space-x-2">
-                                        <Icon name="sunSet" size="50" />
-                                        <h2 className="">Sunset: {weatherData.forecast?.forecastday[0].astro?.sunset}</h2>
+                                        <div className="flex items-center space-x-2">
+                                            <Icon name="humidity" size="50" />
+                                            <h2>Average Humidity: %{weatherData.forecast?.forecastday[0].day?.avghumidity}</h2>
+                                        </div>
+                                        <div className="flex items-center space-x-2">
+                                            <Icon name="sunRise" size="50" />
+                                            <h2 className="">Sunrise: {weatherData.forecast?.forecastday[0].astro?.sunrise}</h2>
+                                        </div>
+                                        <div className="flex items-center space-x-2">
+                                            <Icon name="sunSet" size="50" />
+                                            <h2 className="">Sunset: {weatherData.forecast?.forecastday[0].astro?.sunset}</h2>
+                                        </div>
                                     </div>
                                 </div>
+                                <HourlyChart />
                             </div>
                             <Disclosure>
                                 {({ open }) => (
-                                    <div className="flex flex-col mx-auto opacity-80 py-8 md:py-5 shadow-xl drop-shadow-2xl">
-                                        <Disclosure.Button className="px-16 mx-auto md:m-5 shadow-xl drop-shadow-xl bg-[#112d4e] bg-opacity-85 border rounded-md py-7 text-white duration-700 outline-none transition-all font-semibold relative">
+                                    <div className={`flex flex-col mx-auto opacity-80 py-8 rounded-md md:py-5 ${open && "bg-gray-800/80 shadow-2xl drop-shadow-2xl duration-300 transition-colors"}`}>
+                                        <Disclosure.Button className="px-16 mx-auto md:m-5  bg-[#112d4e] bg-opacity-85 border rounded-md py-7 text-white duration-1000 outline-none transition-all delay-1000 font-semibold relative">
                                             {open ? 'Hide Details' : 'Show Details'}
                                         </Disclosure.Button>
                                         <Transition
@@ -196,7 +199,8 @@ export default function Home() {
                             className="w-full pb-10"
                         >
                             {weatherData.forecast?.forecastday.map((day) => (
-                                <SwiperSlide key={day.date} className="flex justify-center border-black items-center text-center px-1">
+                                <SwiperSlide key={day.date} className="flex justify-center overflow-hidden
+                                 border-black items-center text-center px-1">
                                     <div className={clsx("flex flex-col border items-center font-medium px-4 pb-5 text-md justify-start w-60 h-80 bg-[#F9F7F7] opacity-85", {
                                         "!bg-[#112D4e] text-white": moment(day.date).format('DD') === moment().format('DD')
                                     })}>
@@ -211,34 +215,6 @@ export default function Home() {
                         </Swiper>
                         <img className="w-full h-full absolute opacity-50 rounded-lg" src="https://t4.ftcdn.net/jpg/02/66/38/15/360_F_266381525_alVrbw15u5EjhIpoqqa1eI5ghSf7hpz7.jpg" alt="" />
                     </div>
-
-                    <div className="bg-[#F9F7F7] drop-shadow-2xl container mx-auto rounded-lg mt-10 text-lg p-10">
-                        <h1 className="flex item-start font-semibold text-xl p-10">Saatlik Tahmin</h1>
-                        <Swiper
-                            spaceBetween={0}
-                            slidesPerView={isMobile ? 4 : 6}
-                            parallax={true}
-                            initialSlide={moment().format('H') - 1}
-                            loop={true}
-                            onSlideChange={() => console.log('slide change')}
-                            onSwiper={(swiper) => console.log(swiper)}
-                            className=" rounded p-10 text-lg"
-                        >
-                            {weatherData.forecast?.forecastday[0].hour.map((hour, index) => (
-                                <SwiperSlide key={index} className="flex  flex-col items-center justify-center mx-auto w-24">
-                                    <div className={clsx("rounded", {
-                                        "bg-[#3F72AF] text-white p-5": moment(hour?.time).format('H') === moment().format('H'),
-                                    })}>
-                                        <img width={60} height={60} src={hour?.condition?.icon} alt={hour?.condition?.text} />
-                                        <h6>{hour?.temp_c} °C</h6>
-                                        <h6>{moment(hour?.time).format('LT')}</h6>
-                                    </div>
-                                </SwiperSlide>
-                            ))
-                            }
-                        </Swiper>
-                    </div>
-
                     <div>
                         {weatherData.alerts && (
                             weatherData.alerts.alert.map((alert, index) => (
@@ -258,17 +234,6 @@ export default function Home() {
 
                 </div>
             )}
-
-
-            {
-                weatherData && (
-                    <div>
-                        sdsda
-                    </div>
-                )
-            }
-            <TurkeyWeatherMap />
-
         </main>
     )
 }

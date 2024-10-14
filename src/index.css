@@ -6,3 +6,22 @@
 * {
     font-family: "Poppins", sans-serif;
 }
+
+.canvasjs-chart-credit {
+    display: none;
+    overflow: hidden;
+}
+
+.canvasjs-chart-tooltip {
+    font-family: "Poppins", sans-serif;
+    padding: 10px;
+    background-color: black;
+    overflow: hidden;
+}
+
+.canvasjs-chart-canvas {
+    overflow: hidden;
+    padding: 10px 0 0 0;
+    
+}
+
